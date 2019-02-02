@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gin-rummy", "gin-rummy\gin-rummy.csproj", "{40228C15-8722-415C-8D68-1A0D811CB13F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test-gin-rummy", "test-gin-rummy\test-gin-rummy.csproj", "{7D3ACDF9-9D18-4BBF-8BA9-D1922B1E5F49}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{40228C15-8722-415C-8D68-1A0D811CB13F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40228C15-8722-415C-8D68-1A0D811CB13F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40228C15-8722-415C-8D68-1A0D811CB13F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D3ACDF9-9D18-4BBF-8BA9-D1922B1E5F49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D3ACDF9-9D18-4BBF-8BA9-D1922B1E5F49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D3ACDF9-9D18-4BBF-8BA9-D1922B1E5F49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D3ACDF9-9D18-4BBF-8BA9-D1922B1E5F49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
