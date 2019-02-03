@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Cards\Card.cs" />
     <Compile Include="Cards\Deck.cs" />
+    <Compile Include="Cards\Hand.cs" />
     <Compile Include="Cards\Suit.cs" />
     <Compile Include="Cards\Table.cs" />
     <Compile Include="Form1.cs">
