@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace gin_rummy.Cards
 {
-    class Card
+    public class Card
     {
         public enum Rank { Ace, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King }
 
@@ -19,5 +19,9 @@ namespace gin_rummy.Cards
             this.RankValue = rank;
         }
 
+        public bool IsEqual(Card other)
+        {
+            return this.Suit.SuitTypeValue == other.Suit.SuitTypeValue && this.RankValue == other.RankValue;
+        }
     }
 }

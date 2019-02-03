@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace gin_rummy.Cards
 {
-    class Suit
+    public class Suit
     {
         public enum SuitType { Hearts, Spades, Diamonds, Clubs }
         public enum SuitColour { Red, Black }
@@ -40,6 +40,23 @@ namespace gin_rummy.Cards
         public static Suit Clubs()
         {
             return new Suit(SuitType.Clubs, SuitColour.Black);
+        }
+
+        public static Suit GetSuit(SuitType suitType)
+        {
+            switch (suitType)
+            {
+                case SuitType.Hearts:
+                    return Suit.Hearts();
+                case SuitType.Spades:
+                    return Suit.Spades();
+                case SuitType.Diamonds:
+                    return Suit.Diamonds();
+                case SuitType.Clubs:
+                    return Suit.Clubs();
+                default:
+                    return null;
+            }
         }
 
     }
