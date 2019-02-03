@@ -8,14 +8,25 @@ namespace gin_rummy.Cards
 {
     public class Deck
     {
+        public enum DeckType { Empty, Standard }
+
         private List<Card> _cards;
 
         public int Size { get { return _cards.Count; } }
 
-        public Deck()
+        public Deck() : this(DeckType.Standard)
+        {
+        }
+
+        public Deck(DeckType deckType)
         {
             _cards = new List<Card>();
-            InitialiseStandardDeck(_cards);
+            if (deckType == DeckType.Empty)
+            {
+                return;
+            }
+
+            AddStandard52(_cards);
         }
 
         public void Clear()
@@ -25,10 +36,20 @@ namespace gin_rummy.Cards
 
         public Card PeekTop()
         {
-            return PeekAt(0);
+            return PeekAt(_cards.Count - 1);
         }
 
         public Card RemoveTop()
+        {
+            return RemoveAt(_cards.Count - 1);
+        }
+
+        public Card PeekBottom()
+        {
+            return PeekAt(0);
+        }
+
+        public Card RemoveBottom()
         {
             return RemoveAt(0);
         }
@@ -73,7 +94,7 @@ namespace gin_rummy.Cards
             _cards = tempDeck;
         }
 
-        public void InitialiseStandardDeck(List<Card> cards)
+        public void AddStandard52(List<Card> cards)
         {
             _cards.Clear();
             foreach (Suit.SuitType suitType in Enum.GetValues(typeof(Suit.SuitType)))
