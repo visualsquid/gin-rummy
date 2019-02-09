@@ -40,5 +40,9 @@ namespace gin_rummy.Cards
             _cards.Insert(i, card);
         }
 
+        public override string ToString()
+        {
+            return string.Join(" ", _cards.Select(i => i.ToString()));
+        }
     }
 }

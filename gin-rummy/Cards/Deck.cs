@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace gin_rummy.Cards
 {
@@ -104,6 +105,11 @@ namespace gin_rummy.Cards
                     cards.Add(new Card(Suit.GetSuit(suitType), rank));
                 }
             }
+        }
+
+        public override string ToString()
+        {
+            return string.Join(" ", _cards.Select(i => i.ToString()));
         }
     }
 }

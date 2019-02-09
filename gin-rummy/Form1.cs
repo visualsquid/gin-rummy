@@ -1,4 +1,5 @@
-﻿using System;
+﻿using gin_rummy.Cards;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -15,6 +16,18 @@ namespace gin_rummy
         public Form1()
         {
             InitializeComponent();
+        }
+
+        private void bNewHand_Click(object sender, EventArgs e)
+        {
+            Deck deck = new Deck();
+            deck.Shuffle();
+            Hand hand = new Hand();
+            while (hand.Size < 10)
+            {
+                hand.AddCard(deck.RemoveTop());
+            }
+            eYourHand.Text = hand.ToString();
         }
     }
 }
