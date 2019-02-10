@@ -30,14 +30,21 @@ namespace gin_rummy.Cards
             return _cards.Remove(card);
         }
 
-        public void AddCard(Card card)
+        public virtual bool AddCard(Card card)
         {
             _cards.Add(card);
+            return true;
         }
 
-        public void AddAtPosition(Card card, int i)
+        public virtual bool AddAtPosition(Card card, int i)
         {
             _cards.Insert(i, card);
+            return true;
+        }
+
+        public void Clear()
+        {
+            _cards.Clear();
         }
 
         public override string ToString()

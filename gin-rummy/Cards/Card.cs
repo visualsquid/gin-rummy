@@ -8,7 +8,7 @@ namespace gin_rummy.Cards
 {
     public class Card
     {
-        public enum Rank { Ace, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King }
+        public enum Rank { Ace, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King } // Gin rummy rank ordering is implicit in this enum
 
         public Suit Suit { get; set; }
         public Rank RankValue { get; set; }

@@ -45,21 +45,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actors\IPlayer.cs" />
+    <Compile Include="Actors\Player.cs" />
     <Compile Include="Cards\Card.cs" />
     <Compile Include="Cards\Deck.cs" />
-    <Compile Include="Cards\Hand.cs" />
+    <Compile Include="Cards\GinRummyHand.cs" />
+    <Compile Include="Cards\GinRummyRankComparer.cs" />
+    <Compile Include="Cards\GinRummySuitEqualityComparer.cs" />
+    <Compile Include="GameStructures\Game.cs" />
+    <Compile Include="GameStructures\Hand.cs" />
+    <Compile Include="GameStructures\Meld.cs" />
     <Compile Include="Cards\Suit.cs" />
-    <Compile Include="Cards\Table.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="GameStructures\Table.cs" />
+    <Compile Include="Forms\GameForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Forms\GameForm.Designer.cs">
+      <DependentUpon>GameForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\GameForm.resx">
+      <DependentUpon>GameForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -83,8 +90,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Actors\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
