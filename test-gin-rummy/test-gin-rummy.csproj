@@ -49,11 +49,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cards\TestDeck.cs" />
-    <Compile Include="Cards\TestMeldBasic.cs" />
-    <Compile Include="Cards\TestMeldSets.cs" />
+    <Compile Include="TestLogic\TestMeldBasic.cs" />
+    <Compile Include="TestLogic\TestMeldSets.cs" />
     <Compile Include="Cards\TestTable.cs" />
-    <Compile Include="Cards\TestMeldRuns.cs" />
+    <Compile Include="TestLogic\TestMeldRuns.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestLogic\TestDeadWoodPenalties.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

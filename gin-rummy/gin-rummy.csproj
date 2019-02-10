@@ -45,7 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actors\DeadWoodScorer.cs" />
     <Compile Include="Actors\IPlayer.cs" />
+    <Compile Include="Actors\MeldChecker.cs" />
     <Compile Include="Actors\Player.cs" />
     <Compile Include="Cards\Card.cs" />
     <Compile Include="Cards\Deck.cs" />
@@ -56,6 +58,7 @@
     <Compile Include="GameStructures\Hand.cs" />
     <Compile Include="GameStructures\Meld.cs" />
     <Compile Include="Cards\Suit.cs" />
+    <Compile Include="GameStructures\Showdown.cs" />
     <Compile Include="GameStructures\Table.cs" />
     <Compile Include="Forms\GameForm.cs">
       <SubType>Form</SubType>

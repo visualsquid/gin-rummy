@@ -13,6 +13,24 @@ namespace gin_rummy.Cards
         public Suit Suit { get; set; }
         public Rank RankValue { get; set; }
 
+        public Card()
+        {
+            this.Suit = GetRandomSuit();
+            this.RankValue = GetRandomRank();
+        }
+
+        public Card(Suit suit)
+        {
+            this.Suit = suit;
+            this.RankValue = GetRandomRank();
+        }
+
+        public Card(Rank rank)
+        {
+            this.Suit = GetRandomSuit();
+            this.RankValue = rank;
+        }
+
         public Card(Suit suit, Rank rank)
         {
             this.Suit = suit;
@@ -93,6 +111,34 @@ namespace gin_rummy.Cards
             }
 
             return $"{rank}{suit}";
+        }
+
+        public Rank GetRandomRank()
+        {
+            Random random = new Random();
+            int next = random.Next(Enum.GetValues(typeof(Rank)).Length);
+
+            return (Rank)next;
+        }
+
+        public Suit GetRandomSuit()
+        {
+            Random random = new Random();
+            int next = random.Next(Enum.GetValues(typeof(Suit.SuitType)).Length);
+
+            switch (next)
+            {
+                case 0:
+                    return Suit.Hearts();
+                case 1:
+                    return Suit.Clubs();
+                case 2:
+                    return Suit.Diamonds();
+                case 3:
+                    return Suit.Spades();
+                default:
+                    throw new Exception("An unexpected error occurred while generating random suit.");
+            }
         }
     }
 }

@@ -14,8 +14,6 @@ namespace gin_rummy.Cards
         public SuitType SuitTypeValue { get; set; }
         public SuitColour SuitColourValue { get; set; }
 
-        private Suit () { }
-
         private Suit (SuitType suitType, SuitColour suitColour)
         {
             this.SuitTypeValue = suitType;

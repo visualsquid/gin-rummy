@@ -23,15 +23,14 @@ namespace gin_rummy.Actors
             _hand.Clear();
         }
 
-        public Card DiscardCard()
+        public void DrawCard(Card c)
         {
-            throw new NotImplementedException();
+            _hand.AddCard(c);
         }
 
-        public void TakeCard(Card c)
+        public bool DiscardCard(Card c)
         {
-            throw new NotImplementedException();
+            return _hand.RemoveCard(c);
         }
-       
     }
 }

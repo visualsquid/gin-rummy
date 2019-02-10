@@ -11,6 +11,8 @@ namespace gin_rummy.Actors
     {
         int HandSize { get; }
 
+        void DrawCard(Card c);
+        bool DiscardCard(Card c);
         void ClearHand();
     }
 }
