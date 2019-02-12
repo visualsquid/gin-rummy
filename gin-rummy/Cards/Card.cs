@@ -8,112 +8,84 @@ namespace gin_rummy.Cards
 {
     public class Card
     {
-        public enum Rank { Ace, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King } // Gin rummy rank ordering is implicit in this enum
+        private Dictionary<string, Suit> _stringsToSuits;
+        private Dictionary<string, Rank> _stringsToRanks;
 
-        public Suit Suit { get; set; }
+        public enum Rank { Ace, Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King } // Gin rummy rank ordering is implicit in this enum
+        public enum Suit { Hearts, Spades, Diamonds, Clubs }
+
+        public Suit SuitValue { get; set; }
         public Rank RankValue { get; set; }
 
-        public Card()
-        {
-            this.Suit = GetRandomSuit();
-            this.RankValue = GetRandomRank();
-        }
+        public Card() : this(GetRandomSuit(), GetRandomRank()) { }
 
-        public Card(Suit suit)
-        {
-            this.Suit = suit;
-            this.RankValue = GetRandomRank();
-        }
+        public Card(Suit suit) : this(suit, GetRandomRank()) { }
 
-        public Card(Rank rank)
-        {
-            this.Suit = GetRandomSuit();
-            this.RankValue = rank;
-        }
+        public Card(Rank rank) : this(GetRandomSuit(), rank) { }
 
         public Card(Suit suit, Rank rank)
         {
-            this.Suit = suit;
+            CreateMaps();
+            this.SuitValue = suit;
             this.RankValue = rank;
+        }
+
+        public Card(string stringValue)
+        {
+            string suit = stringValue.Substring(stringValue.Length - 2, 1);
+            string rank = stringValue.Substring(0, stringValue.Length - 1);
+
+            this.SuitValue = _stringsToSuits[suit];
+            this.RankValue = _stringsToRanks[rank];
+        }
+
+        private void CreateMaps()
+        {
+            CreateSuitMap();
+            CreateRankMap();
+        }
+
+        private void CreateSuitMap()
+        {
+            _stringsToSuits = new Dictionary<string, Suit>();
+            _stringsToSuits.Add("h", Suit.Hearts);
+            _stringsToSuits.Add("d", Suit.Diamonds);
+            _stringsToSuits.Add("s", Suit.Spades);
+            _stringsToSuits.Add("c", Suit.Clubs);
+        }
+
+        private void CreateRankMap()
+        {
+            _stringsToRanks = new Dictionary<string, Rank>();
+            _stringsToRanks.Add("A", Rank.Ace);
+            _stringsToRanks.Add("2", Rank.Two);
+            _stringsToRanks.Add("3", Rank.Three);
+            _stringsToRanks.Add("4", Rank.Four);
+            _stringsToRanks.Add("5", Rank.Five);
+            _stringsToRanks.Add("6", Rank.Six);
+            _stringsToRanks.Add("7", Rank.Seven);
+            _stringsToRanks.Add("8", Rank.Eight);
+            _stringsToRanks.Add("9", Rank.Nine);
+            _stringsToRanks.Add("10", Rank.Ten);
+            _stringsToRanks.Add("J", Rank.Jack);
+            _stringsToRanks.Add("Q", Rank.Queen);
+            _stringsToRanks.Add("K", Rank.King);
         }
 
         public bool IsEqual(Card other)
         {
-            return this.Suit.SuitTypeValue == other.Suit.SuitTypeValue && this.RankValue == other.RankValue;
+            return this.SuitValue == other.SuitValue && this.RankValue == other.RankValue;
         }
 
         public override string ToString()
         {
-            string suit, rank;
-
-            switch (Suit.SuitTypeValue)
-            {
-                case Suit.SuitType.Hearts:
-                    suit = "h";
-                    break;
-                case Suit.SuitType.Spades:
-                    suit = "s";
-                    break;
-                case Suit.SuitType.Diamonds:
-                    suit = "d";
-                    break;
-                case Suit.SuitType.Clubs:
-                    suit = "c";
-                    break;
-                default:
-                    throw new Exception($"Invalid suit{Suit.SuitTypeValue.ToString()}");
-            }
-
-            switch (RankValue)
-            {
-                case Rank.Ace:
-                    rank = "A";
-                    break;
-                case Rank.Two:
-                    rank = "2";
-                    break;
-                case Rank.Three:
-                    rank = "3";
-                    break;
-                case Rank.Four:
-                    rank = "4";
-                    break;
-                case Rank.Five:
-                    rank = "5";
-                    break;
-                case Rank.Six:
-                    rank = "6";
-                    break;
-                case Rank.Seven:
-                    rank = "7";
-                    break;
-                case Rank.Eight:
-                    rank = "8";
-                    break;
-                case Rank.Nine:
-                    rank = "9";
-                    break;
-                case Rank.Ten:
-                    rank = "10";
-                    break;
-                case Rank.Jack:
-                    rank = "J";
-                    break;
-                case Rank.Queen:
-                    rank = "Q";
-                    break;
-                case Rank.King:
-                    rank = "K";
-                    break;
-                default:
-                    throw new Exception($"Invalid rank{RankValue.ToString()}");
-
-            }
+            string rank = _stringsToRanks.First(i => i.Value == RankValue).Key;
+            string suit = _stringsToSuits.First(i => i.Value == SuitValue).Key;
 
             return $"{rank}{suit}";
         }
 
-        public Rank GetRandomRank()
+        public static Rank GetRandomRank()
         {
             Random random = new Random();
             int next = random.Next(Enum.GetValues(typeof(Rank)).Length);
@@ -121,24 +93,14 @@ namespace gin_rummy.Cards
             return (Rank)next;
         }
 
-        public Suit GetRandomSuit()
+        public static Suit GetRandomSuit()
         {
+            Array availableValues = Enum.GetValues(typeof(Suit));
+            IEnumerable<Suit> convertedValues = availableValues.Cast<Suit>();
             Random random = new Random();
-            int next = random.Next(Enum.GetValues(typeof(Suit.SuitType)).Length);
+            int next = random.Next(availableValues.Length);
 
-            switch (next)
-            {
-                case 0:
-                    return Suit.Hearts();
-                case 1:
-                    return Suit.Clubs();
-                case 2:
-                    return Suit.Diamonds();
-                case 3:
-                    return Suit.Spades();
-                default:
-                    throw new Exception("An unexpected error occurred while generating random suit.");
-            }
+            return convertedValues.ElementAt(next);
         }
     }
 }

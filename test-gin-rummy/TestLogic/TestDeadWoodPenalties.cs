@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using gin_rummy.Actors;
 using gin_rummy.Cards;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static gin_rummy.Cards.Card;
 
 namespace test_gin_rummy.TestLogic
 {
@@ -32,16 +33,16 @@ namespace test_gin_rummy.TestLogic
         [TestMethod]
         public void TestLowAce()
         {
-            _deadWood.Add(new Card(Suit.Clubs(), Card.Rank.Ace));
+            _deadWood.Add(new Card(Suit.Clubs, Card.Rank.Ace));
             Assert.AreEqual(1, _scorer.GetDeadWoodPenalty(_deadWood));
         }
 
         [TestMethod]
         public void TestFaceCards()
         {
-            _deadWood.Add(new Card(Suit.Clubs(), Card.Rank.Jack));
-            _deadWood.Add(new Card(Suit.Clubs(), Card.Rank.Queen));
-            _deadWood.Add(new Card(Suit.Clubs(), Card.Rank.King));
+            _deadWood.Add(new Card(Suit.Clubs, Card.Rank.Jack));
+            _deadWood.Add(new Card(Suit.Clubs, Card.Rank.Queen));
+            _deadWood.Add(new Card(Suit.Clubs, Card.Rank.King));
 
             Assert.AreEqual(10 + 10 + 10, _scorer.GetDeadWoodPenalty(_deadWood));
         }
@@ -49,10 +50,10 @@ namespace test_gin_rummy.TestLogic
         [TestMethod]
         public void TestSuitEquality()
         {
-            _deadWood.Add(new Card(Suit.Clubs(), Card.Rank.Five));
-            _deadWood.Add(new Card(Suit.Hearts(), Card.Rank.Five));
-            _deadWood.Add(new Card(Suit.Diamonds(), Card.Rank.Five));
-            _deadWood.Add(new Card(Suit.Spades(), Card.Rank.Five));
+            _deadWood.Add(new Card(Suit.Clubs, Card.Rank.Five));
+            _deadWood.Add(new Card(Suit.Hearts, Card.Rank.Five));
+            _deadWood.Add(new Card(Suit.Diamonds, Card.Rank.Five));
+            _deadWood.Add(new Card(Suit.Spades, Card.Rank.Five));
 
             Assert.AreEqual(5 + 5 + 5 + 5, _scorer.GetDeadWoodPenalty(_deadWood));
         }
@@ -60,9 +61,9 @@ namespace test_gin_rummy.TestLogic
         [TestMethod]
         public void TestMisc()
         {
-            _deadWood.Add(new Card(Suit.Clubs(), Card.Rank.Three));
-            _deadWood.Add(new Card(Suit.Hearts(), Card.Rank.Six));
-            _deadWood.Add(new Card(Suit.Diamonds(), Card.Rank.Ten));
+            _deadWood.Add(new Card(Suit.Clubs, Card.Rank.Three));
+            _deadWood.Add(new Card(Suit.Hearts, Card.Rank.Six));
+            _deadWood.Add(new Card(Suit.Diamonds, Card.Rank.Ten));
 
             Assert.AreEqual(3 + 6 + 10, _scorer.GetDeadWoodPenalty(_deadWood));
         }

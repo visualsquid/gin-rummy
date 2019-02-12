@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static gin_rummy.Cards.Card;
 
 namespace gin_rummy.Actors
 {
@@ -27,9 +28,9 @@ namespace gin_rummy.Actors
                 return false;
             }
 
-            Suit.SuitType firstItemSuit = cardsInMeld[0].Suit.SuitTypeValue;
+            Suit firstItemSuit = cardsInMeld[0].SuitValue;
 
-            if (!cardsInMeld.All(c => c.Suit.SuitTypeValue == firstItemSuit))
+            if (!cardsInMeld.All(c => c.SuitValue == firstItemSuit))
             {
                 return false;
             }

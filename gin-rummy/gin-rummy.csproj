@@ -51,13 +51,15 @@
     <Compile Include="Actors\Player.cs" />
     <Compile Include="Cards\Card.cs" />
     <Compile Include="Cards\Deck.cs" />
+    <Compile Include="Cards\FourColourScheme.cs" />
     <Compile Include="Cards\GinRummyHand.cs" />
     <Compile Include="Cards\GinRummyRankComparer.cs" />
     <Compile Include="Cards\GinRummySuitEqualityComparer.cs" />
+    <Compile Include="Cards\SuitColourScheme.cs" />
+    <Compile Include="Cards\TwoColourScheme.cs" />
     <Compile Include="GameStructures\Game.cs" />
     <Compile Include="GameStructures\Hand.cs" />
     <Compile Include="GameStructures\Meld.cs" />
-    <Compile Include="Cards\Suit.cs" />
     <Compile Include="GameStructures\Showdown.cs" />
     <Compile Include="GameStructures\Table.cs" />
     <Compile Include="Forms\GameForm.cs">

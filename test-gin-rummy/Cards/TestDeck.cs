@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using gin_rummy.Cards;
 using System.Collections.Generic;
 using System.Linq;
+using static gin_rummy.Cards.Card;
 
 namespace test_gin_rummy
 {
@@ -47,7 +48,7 @@ namespace test_gin_rummy
         {
             Deck deck = new Deck();
             int originalSize = deck.Size;
-            deck.Add(new Card(Suit.Hearts(), Card.Rank.Ace));
+            deck.Add(new Card(Suit.Hearts, Card.Rank.Ace));
 
             Assert.AreEqual(originalSize + 1, deck.Size);
         }

@@ -31,19 +31,22 @@
             this.pYourHand = new System.Windows.Forms.Panel();
             this.mnMain = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newCPUGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.randomplayCPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pYourCards = new System.Windows.Forms.FlowLayoutPanel();
+            this.pYourHand.SuspendLayout();
             this.mnMain.SuspendLayout();
             this.SuspendLayout();
             // 
             // pYourHand
             // 
+            this.pYourHand.Controls.Add(this.pYourCards);
             this.pYourHand.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pYourHand.Location = new System.Drawing.Point(0, 303);
+            this.pYourHand.Location = new System.Drawing.Point(0, 356);
             this.pYourHand.Name = "pYourHand";
-            this.pYourHand.Size = new System.Drawing.Size(800, 147);
+            this.pYourHand.Size = new System.Drawing.Size(800, 94);
             this.pYourHand.TabIndex = 0;
             // 
             // mnMain
@@ -65,6 +68,13 @@
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(92, 22);
+            this.exitToolStripMenuItem.Text = "Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
             // gameToolStripMenuItem
             // 
             this.gameToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -84,16 +94,17 @@
             // randomplayCPUToolStripMenuItem
             // 
             this.randomplayCPUToolStripMenuItem.Name = "randomplayCPUToolStripMenuItem";
-            this.randomplayCPUToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.randomplayCPUToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
             this.randomplayCPUToolStripMenuItem.Text = "Random-play CPU";
             this.randomplayCPUToolStripMenuItem.Click += new System.EventHandler(this.randomplayCPUToolStripMenuItem_Click);
             // 
-            // exitToolStripMenuItem
+            // pYourCards
             // 
-            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.exitToolStripMenuItem.Text = "Exit";
-            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            this.pYourCards.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pYourCards.Location = new System.Drawing.Point(0, 0);
+            this.pYourCards.Name = "pYourCards";
+            this.pYourCards.Size = new System.Drawing.Size(800, 94);
+            this.pYourCards.TabIndex = 0;
             // 
             // GameForm
             // 
@@ -105,6 +116,7 @@
             this.MainMenuStrip = this.mnMain;
             this.Name = "GameForm";
             this.Text = "GameForm";
+            this.pYourHand.ResumeLayout(false);
             this.mnMain.ResumeLayout(false);
             this.mnMain.PerformLayout();
             this.ResumeLayout(false);
@@ -121,5 +133,6 @@
         private System.Windows.Forms.ToolStripMenuItem gameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newCPUGameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem randomplayCPUToolStripMenuItem;
+        private System.Windows.Forms.FlowLayoutPanel pYourCards;
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq.Expressions;
+using static gin_rummy.Cards.Card;
 
 namespace gin_rummy.Cards
 {
@@ -98,11 +99,11 @@ namespace gin_rummy.Cards
         public void AddStandard52(List<Card> cards)
         {
             _cards.Clear();
-            foreach (Suit.SuitType suitType in Enum.GetValues(typeof(Suit.SuitType)))
+            foreach (Suit suit in Enum.GetValues(typeof(Suit)))
             {
                 foreach (Card.Rank rank in Enum.GetValues(typeof(Card.Rank)))
                 {
-                    cards.Add(new Card(Suit.GetSuit(suitType), rank));
+                    cards.Add(new Card(suit, rank));
                 }
             }
         }
