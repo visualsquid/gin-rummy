@@ -32,8 +32,10 @@ namespace gin_rummy.Cards
 
         public Card(string stringValue)
         {
-            string suit = stringValue.Substring(stringValue.Length - 2, 1);
-            string rank = stringValue.Substring(0, stringValue.Length - 1);
+            CreateMaps();
+
+            string suit = stringValue[1].ToString();
+            string rank = stringValue[0].ToString();
 
             this.SuitValue = _stringsToSuits[suit];
             this.RankValue = _stringsToRanks[rank];
@@ -66,7 +68,7 @@ namespace gin_rummy.Cards
             _stringsToRanks.Add("7", Rank.Seven);
             _stringsToRanks.Add("8", Rank.Eight);
             _stringsToRanks.Add("9", Rank.Nine);
-            _stringsToRanks.Add("10", Rank.Ten);
+            _stringsToRanks.Add("T", Rank.Ten);
             _stringsToRanks.Add("J", Rank.Jack);
             _stringsToRanks.Add("Q", Rank.Queen);
             _stringsToRanks.Add("K", Rank.King);
@@ -87,6 +89,7 @@ namespace gin_rummy.Cards
 
         public static Rank GetRandomRank()
         {
+            // TODO: fix randomness of ranks
             Random random = new Random();
             int next = random.Next(Enum.GetValues(typeof(Rank)).Length);
 
@@ -95,6 +98,7 @@ namespace gin_rummy.Cards
 
         public static Suit GetRandomSuit()
         {
+            // TODO: fix randomness of suits
             Array availableValues = Enum.GetValues(typeof(Suit));
             IEnumerable<Suit> convertedValues = availableValues.Cast<Suit>();
             Random random = new Random();

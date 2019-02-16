@@ -57,6 +57,12 @@
     <Compile Include="Cards\GinRummySuitEqualityComparer.cs" />
     <Compile Include="Cards\SuitColourScheme.cs" />
     <Compile Include="Cards\TwoColourScheme.cs" />
+    <Compile Include="Controls\CardPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\CardPanel.Designer.cs">
+      <DependentUpon>CardPanel.cs</DependentUpon>
+    </Compile>
     <Compile Include="GameStructures\Game.cs" />
     <Compile Include="GameStructures\Hand.cs" />
     <Compile Include="GameStructures\Meld.cs" />
@@ -70,6 +76,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Controls\CardPanel.resx">
+      <DependentUpon>CardPanel.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
     </EmbeddedResource>

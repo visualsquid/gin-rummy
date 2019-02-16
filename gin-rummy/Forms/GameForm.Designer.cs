@@ -35,14 +35,11 @@
             this.gameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newCPUGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.randomplayCPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pYourCards = new System.Windows.Forms.FlowLayoutPanel();
-            this.pYourHand.SuspendLayout();
             this.mnMain.SuspendLayout();
             this.SuspendLayout();
             // 
             // pYourHand
             // 
-            this.pYourHand.Controls.Add(this.pYourCards);
             this.pYourHand.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.pYourHand.Location = new System.Drawing.Point(0, 356);
             this.pYourHand.Name = "pYourHand";
@@ -88,7 +85,7 @@
             this.newCPUGameToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.randomplayCPUToolStripMenuItem});
             this.newCPUGameToolStripMenuItem.Name = "newCPUGameToolStripMenuItem";
-            this.newCPUGameToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.newCPUGameToolStripMenuItem.Size = new System.Drawing.Size(157, 22);
             this.newCPUGameToolStripMenuItem.Text = "New CPU game";
             // 
             // randomplayCPUToolStripMenuItem
@@ -97,14 +94,6 @@
             this.randomplayCPUToolStripMenuItem.Size = new System.Drawing.Size(172, 22);
             this.randomplayCPUToolStripMenuItem.Text = "Random-play CPU";
             this.randomplayCPUToolStripMenuItem.Click += new System.EventHandler(this.randomplayCPUToolStripMenuItem_Click);
-            // 
-            // pYourCards
-            // 
-            this.pYourCards.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pYourCards.Location = new System.Drawing.Point(0, 0);
-            this.pYourCards.Name = "pYourCards";
-            this.pYourCards.Size = new System.Drawing.Size(800, 94);
-            this.pYourCards.TabIndex = 0;
             // 
             // GameForm
             // 
@@ -116,7 +105,7 @@
             this.MainMenuStrip = this.mnMain;
             this.Name = "GameForm";
             this.Text = "GameForm";
-            this.pYourHand.ResumeLayout(false);
+            this.Shown += new System.EventHandler(this.GameForm_Shown);
             this.mnMain.ResumeLayout(false);
             this.mnMain.PerformLayout();
             this.ResumeLayout(false);
@@ -133,6 +122,5 @@
         private System.Windows.Forms.ToolStripMenuItem gameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newCPUGameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem randomplayCPUToolStripMenuItem;
-        private System.Windows.Forms.FlowLayoutPanel pYourCards;
     }
 }
