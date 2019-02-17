@@ -57,11 +57,18 @@
     <Compile Include="Cards\GinRummySuitEqualityComparer.cs" />
     <Compile Include="Cards\SuitColourScheme.cs" />
     <Compile Include="Cards\TwoColourScheme.cs" />
+    <Compile Include="ControlsHelpers\ButtonCardDisplayer.cs" />
     <Compile Include="Controls\CardPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\CardPanel.Designer.cs">
       <DependentUpon>CardPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\CardStacks.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\CardStacks.Designer.cs">
+      <DependentUpon>CardStacks.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\PlayerActions.cs">
       <SubType>UserControl</SubType>
@@ -84,6 +91,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Controls\CardPanel.resx">
       <DependentUpon>CardPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\CardStacks.resx">
+      <DependentUpon>CardStacks.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\PlayerActions.resx">
       <DependentUpon>PlayerActions.cs</DependentUpon>

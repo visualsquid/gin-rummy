@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using gin_rummy.Cards;
 using static gin_rummy.Cards.SuitColourScheme;
+using gin_rummy.ControlsHelpers;
+using static gin_rummy.Cards.Card;
 
 namespace gin_rummy.Controls
 {
@@ -17,15 +19,25 @@ namespace gin_rummy.Controls
     /// </summary>
     public partial class CardPanel : UserControl
     {
-        private const double CardWidthRelativeToHeight = 0.66;
-
         private List<Card> _cards;
+        private ButtonCardDisplayer _cardDisplayer;
+        private SuitColourScheme _suitColourScheme;
 
         public delegate void OnCardSelected(Card card, out bool removeCard);
 
         public OnCardSelected CardSelected { get; set; }
-        public SuitColourScheme ColourScheme { get; set; }
-        public Dictionary<SuitColour, Color> ColourMap { get; set; }
+        public SuitColourScheme ColourScheme
+        {
+            get
+            {
+                return _suitColourScheme;
+            }
+            set
+            {
+                _suitColourScheme = value;
+                _cardDisplayer = new ButtonCardDisplayer(value);
+            }
+        }
         public bool ShowCards { get; set; }
         public bool AllowSelection { get; set; }
         public bool AllowReordering { get; set; }
@@ -46,9 +58,6 @@ namespace gin_rummy.Controls
         private void InitialiseDefaultProperties()
         {
             ColourScheme = new TwoColourScheme();
-            ColourMap = new Dictionary<SuitColour, Color>();
-            ColourMap.Add(SuitColour.Black, Color.LightSlateGray);
-            ColourMap.Add(SuitColour.Red, Color.OrangeRed);
             ShowCards = false;
             AllowSelection = false;
             AllowReordering = false;
@@ -62,18 +71,16 @@ namespace gin_rummy.Controls
 
         private void AddCardToDisplay(Card card, bool showCards)
         {
+
             Button button = new Button();
             button.Parent = pCards;
-            button.Height = button.Parent.Height;
-            button.Width = (int)(button.Height * CardWidthRelativeToHeight);
-
             if (showCards)
             {
-                SetButtonAsFrontOfCard(button, card);
+                _cardDisplayer.DisplayCardFaceUp(button, card, 0);
             }
             else
             {
-                SetButtonAsBackOfCard(button);
+                _cardDisplayer.DisplayCardFaceDown(button, 0);
             }
 
             if (AllowReordering)
@@ -94,20 +101,6 @@ namespace gin_rummy.Controls
                 button.PreviewKeyDown += CardPanelPreviewKeyDown;
                 button.KeyDown += CardPanelKeyDown;
             }
-        }
-
-        private void SetButtonAsFrontOfCard(Button button, Card card)
-        {
-            button.BackColor = ColourMap[ColourScheme.GetColour(card.SuitValue)];
-            button.Font = new Font("Arial", 16, FontStyle.Bold);
-            button.Text = card.ToString();
-            button.TextAlign = ContentAlignment.MiddleCenter;
-        }
-
-        private void SetButtonAsBackOfCard(Button button)
-        {
-            button.BackColor = Color.DarkSlateGray; // TODO: variablise back-of-card display
-            button.Text = "";
         }
 
         private void CardPanelPreviewKeyDown(object sender, PreviewKeyDownEventArgs e)

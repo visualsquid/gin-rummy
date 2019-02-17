@@ -39,12 +39,6 @@ namespace gin_rummy.Forms
                 p.ColourScheme = new TwoColourScheme();
             }
 
-            p.ColourMap = new Dictionary<SuitColour, Color>();
-            p.ColourMap.Add(SuitColour.Black, Color.LightSlateGray);
-            p.ColourMap.Add(SuitColour.Blue, Color.LightSkyBlue);
-            p.ColourMap.Add(SuitColour.Green, Color.LightGreen);
-            p.ColourMap.Add(SuitColour.Red, Color.OrangeRed);
-
             p.CardSelected += CardPanelCardSelected;
             p.ShowCards = true;
             p.AllowReordering = true;
@@ -56,6 +50,13 @@ namespace gin_rummy.Forms
             p.ShowCards = false;
             p.AllowReordering = false;
             p.AllowSelection = false;
+        }
+
+        private void InitialiseStacks(int stockCount)
+        {
+            pStacks.StockCount = stockCount;
+            pStacks.DiscardCount = 0;
+            pStacks.VisibleDiscard = null;
         }
 
         private void CardPanelCardSelected(Card card, out bool removeCard)
@@ -82,6 +83,8 @@ namespace gin_rummy.Forms
                 pYourHand.AddCard(deck.RemoveTop());
                 pOpponentsHand.AddCard(deck.RemoveTop());
             }
+
+            InitialiseStacks(deck.Size);
         }
 
 
