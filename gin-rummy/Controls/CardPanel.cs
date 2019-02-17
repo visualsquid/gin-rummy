@@ -17,15 +17,23 @@ namespace gin_rummy.Controls
     /// </summary>
     public partial class CardPanel : UserControl
     {
+        private const double CardWidthRelativeToHeight = 0.66;
+
+        private List<Card> _cards;
+
         public delegate void OnCardSelected(Card card, out bool removeCard);
 
         public OnCardSelected CardSelected { get; set; }
         public SuitColourScheme ColourScheme { get; set; }
         public Dictionary<SuitColour, Color> ColourMap { get; set; }
+        public bool ShowCards { get; set; }
+        public bool AllowSelection { get; set; }
+        public bool AllowReordering { get; set; }
 
         public CardPanel()
         {
             InitializeComponent();
+            _cards = new List<Card>();
             InitialiseDefaultProperties();
         }
 
@@ -35,46 +43,83 @@ namespace gin_rummy.Controls
             ColourMap = new Dictionary<SuitColour, Color>();
             ColourMap.Add(SuitColour.Black, Color.LightSlateGray);
             ColourMap.Add(SuitColour.Red, Color.OrangeRed);
+            ShowCards = false;
+            AllowSelection = false;
+            AllowReordering = false;
         }
 
         public void AddCard(Card c)
         {
-            Button b = new Button();
-            b.Parent = pCards;
-            b.Height = b.Parent.Height;
-            b.Width = b.Height;
-            b.BackColor = ColourMap[ColourScheme.GetColour(c.SuitValue)];
-            b.Font = new Font("Arial", 16, FontStyle.Bold);
-            b.Text = c.ToString();
-            b.TextAlign = ContentAlignment.MiddleCenter;
-            b.MouseDown += CardPanelMouseDown;
-            b.MouseUp += CardPanelMouseUp;
-            b.AllowDrop = true;
-            b.DragDrop += CardPanelDragDrop;
-            b.DragOver += CardPanelDragOver;
-            
+            _cards.Add(c);
+            AddCardToDisplay(c, ShowCards);
+        }
+
+        private void AddCardToDisplay(Card card, bool showCards)
+        {
+            Button button = new Button();
+            button.Parent = pCards;
+            button.Height = button.Parent.Height;
+            button.Width = (int)(button.Height * CardWidthRelativeToHeight);
+
+            if (showCards)
+            {
+                SetButtonAsFrontOfCard(button, card);
+            }
+            else
+            {
+                SetButtonAsBackOfCard(button);
+            }
+
+            if (AllowReordering)
+            {
+                button.MouseDown += CardPanelMouseDown;
+                button.AllowDrop = true;
+                button.DragDrop += CardPanelDragDrop;
+                button.DragOver += CardPanelDragOver;
+            }
+
+            if (AllowSelection)
+            {
+                button.MouseUp += CardPanelMouseUp;
+            }
+        }
+
+        private void SetButtonAsFrontOfCard(Button button, Card card)
+        {
+            button.BackColor = ColourMap[ColourScheme.GetColour(card.SuitValue)];
+            button.Font = new Font("Arial", 16, FontStyle.Bold);
+            button.Text = card.ToString();
+            button.TextAlign = ContentAlignment.MiddleCenter;
+        }
+
+        private void SetButtonAsBackOfCard(Button button)
+        {
+            button.BackColor = Color.DarkSlateGray; // TODO: variablise back-of-card display
+            button.Text = "";
         }
 
         private void CardPanelMouseUp(object sender, MouseEventArgs e)
         {
-            if (e.Button != MouseButtons.Right || CardSelected == null)
+            if (!AllowSelection || e.Button != MouseButtons.Right || CardSelected == null)
             {
                 return;
             }
 
-            string cardIdentifier = (sender as Button).Text;
+            Button clickedButton = (sender as Button);
+            string cardIdentifier = clickedButton.Text;
             Card card = new Card(cardIdentifier);
             bool removeCard;
             CardSelected(card, out removeCard);
             if (removeCard)
             {
-                pCards.Controls.Remove(sender as Control);
+                _cards.RemoveAt(pCards.Controls.IndexOf(clickedButton));
+                pCards.Controls.Remove(clickedButton);
             }
         }
 
         private void CardPanelMouseDown(object sender, MouseEventArgs e)
         {
-            if (e.Button != MouseButtons.Left)
+            if (!AllowReordering || e.Button != MouseButtons.Left)
             {
                 return;
             }
@@ -100,21 +145,35 @@ namespace gin_rummy.Controls
 
         private void SwapCards(Panel p, Button x, Button y)
         {
+            if (x == y)
+            {
+                return;
+            }
+
             int indexOfX = p.Controls.IndexOf(x);
             int indexOfY = p.Controls.IndexOf(y);
+
+            Card cardX = _cards[indexOfX];
+            Card cardY = _cards[indexOfY];
 
             if (indexOfX < indexOfY)
             {
                 p.Controls.SetChildIndex(x, indexOfY);
                 p.Controls.SetChildIndex(y, indexOfX);
+                _cards.Remove(cardY);
+                _cards.Insert(indexOfY, cardX);
+                _cards.Remove(cardX);
+                _cards.Insert(indexOfX, cardY);
             }
             else
             {
                 p.Controls.SetChildIndex(y, indexOfX);
                 p.Controls.SetChildIndex(x, indexOfY);
+                _cards.Remove(cardX);
+                _cards.Insert(indexOfX, cardY);
+                _cards.Remove(cardY);
+                _cards.Insert(indexOfY, cardX);
             }
-
-
 
         }
     }

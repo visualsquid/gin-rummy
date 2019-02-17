@@ -28,7 +28,7 @@ namespace gin_rummy.Forms
             Close();
         }
 
-        private CardPanel InitialiseCardPanel()
+        private CardPanel InitialisePlayerCardPanel()
         {
             CardPanel p = new CardPanel();
 
@@ -48,6 +48,20 @@ namespace gin_rummy.Forms
             p.ColourMap.Add(SuitColour.Red, Color.OrangeRed);
 
             p.CardSelected += CardPanelCardSelected;
+            p.ShowCards = true;
+            p.AllowReordering = true;
+            p.AllowSelection = true;
+
+            return p;
+        }
+
+        private CardPanel InitialiseOpponentCardPanel()
+        {
+            CardPanel p = new CardPanel();
+
+            p.ShowCards = false;
+            p.AllowReordering = false;
+            p.AllowSelection = false;
 
             return p;
         }
@@ -62,9 +76,14 @@ namespace gin_rummy.Forms
         {
             // TODO: Implement random play CPU game
             pYourHand.Controls.Clear();
-            CardPanel cardPanel = InitialiseCardPanel();
-            pYourHand.Controls.Add(cardPanel);
-            cardPanel.Dock = DockStyle.Fill;
+            CardPanel yourCards = InitialisePlayerCardPanel();
+            pYourHand.Controls.Add(yourCards);
+            yourCards.Dock = DockStyle.Fill;
+
+            pOpponentsHand.Controls.Clear();
+            CardPanel opponentsCards = InitialiseOpponentCardPanel();
+            pOpponentsHand.Controls.Add(opponentsCards);
+            opponentsCards.Dock = DockStyle.Fill;
 
             Deck deck = new Deck();
             deck.Shuffle();
@@ -72,7 +91,8 @@ namespace gin_rummy.Forms
             int i = 10;
             while (i-- > 0)
             {
-                cardPanel.AddCard(deck.RemoveTop());
+                yourCards.AddCard(deck.RemoveTop());
+                opponentsCards.AddCard(deck.RemoveTop());
             }
         }
 

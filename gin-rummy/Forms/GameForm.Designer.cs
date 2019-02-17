@@ -35,15 +35,16 @@
             this.gameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newCPUGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.randomplayCPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pOpponentsHand = new System.Windows.Forms.Panel();
             this.mnMain.SuspendLayout();
             this.SuspendLayout();
             // 
             // pYourHand
             // 
             this.pYourHand.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pYourHand.Location = new System.Drawing.Point(0, 356);
+            this.pYourHand.Location = new System.Drawing.Point(0, 256);
             this.pYourHand.Name = "pYourHand";
-            this.pYourHand.Size = new System.Drawing.Size(800, 94);
+            this.pYourHand.Size = new System.Drawing.Size(673, 76);
             this.pYourHand.TabIndex = 0;
             // 
             // mnMain
@@ -53,7 +54,7 @@
             this.gameToolStripMenuItem});
             this.mnMain.Location = new System.Drawing.Point(0, 0);
             this.mnMain.Name = "mnMain";
-            this.mnMain.Size = new System.Drawing.Size(800, 24);
+            this.mnMain.Size = new System.Drawing.Size(673, 24);
             this.mnMain.TabIndex = 1;
             this.mnMain.Text = "menuStrip1";
             // 
@@ -95,11 +96,20 @@
             this.randomplayCPUToolStripMenuItem.Text = "Random-play CPU";
             this.randomplayCPUToolStripMenuItem.Click += new System.EventHandler(this.randomplayCPUToolStripMenuItem_Click);
             // 
+            // pOpponentsHand
+            // 
+            this.pOpponentsHand.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pOpponentsHand.Location = new System.Drawing.Point(0, 24);
+            this.pOpponentsHand.Name = "pOpponentsHand";
+            this.pOpponentsHand.Size = new System.Drawing.Size(673, 78);
+            this.pOpponentsHand.TabIndex = 2;
+            // 
             // GameForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(673, 332);
+            this.Controls.Add(this.pOpponentsHand);
             this.Controls.Add(this.pYourHand);
             this.Controls.Add(this.mnMain);
             this.MainMenuStrip = this.mnMain;
@@ -122,5 +132,6 @@
         private System.Windows.Forms.ToolStripMenuItem gameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newCPUGameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem randomplayCPUToolStripMenuItem;
+        private System.Windows.Forms.Panel pOpponentsHand;
     }
 }
