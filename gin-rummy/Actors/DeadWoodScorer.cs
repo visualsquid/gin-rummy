@@ -51,5 +51,7 @@ namespace gin_rummy.Actors
 
             return totalPenalty;
         }
+
+        // TODO: implement class for comparing hands
     }
 }

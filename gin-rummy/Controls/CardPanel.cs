@@ -82,6 +82,12 @@ namespace gin_rummy.Controls
             {
                 button.MouseUp += CardPanelMouseUp;
             }
+
+            if (AllowSelection || AllowReordering)
+            {
+                button.PreviewKeyDown += CardPanelPreviewKeyDown;
+                button.KeyDown += CardPanelKeyDown;
+            }
         }
 
         private void SetButtonAsFrontOfCard(Button button, Card card)
@@ -98,22 +104,92 @@ namespace gin_rummy.Controls
             button.Text = "";
         }
 
+        private void CardPanelPreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Left:
+                case Keys.Right:
+                case Keys.Space:
+                    e.IsInputKey = true;
+                    break;
+                default:
+                    e.IsInputKey = false;
+                    break;
+            }
+        }
+
+        private void CardPanelKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Left || e.KeyCode == Keys.Right)
+            {
+                HandleCardLeftRightKeyDown(sender as Button, e);
+            }
+
+            if (e.KeyCode == Keys.Space)
+            {
+                HandleCardSpaceKeyDown(sender as Button, e);
+            }
+        }
+
+        private void HandleCardLeftRightKeyDown(Button sender, KeyEventArgs e)
+        {
+            int buttonIndex = pCards.Controls.IndexOf(sender);
+            Button nextButton = null;
+            if (e.KeyCode == Keys.Left && buttonIndex > 0)
+            {
+                nextButton = (pCards.Controls[buttonIndex - 1] as Button);
+            }
+            else if (e.KeyCode == Keys.Right && buttonIndex < pCards.Controls.Count - 1)
+            {
+                nextButton = (pCards.Controls[buttonIndex + 1] as Button);
+            }
+
+            if (nextButton != null)
+            {
+                if (e.Control)
+                {
+                    SwapCards(pCards, sender, nextButton);
+                }
+                else
+                {
+                    nextButton.Focus();
+                }
+                e.Handled = true;
+            }
+        }
+
+        private void HandleCardSpaceKeyDown(Button sender, KeyEventArgs e)
+        {
+            ProcessCardSelection(sender);
+            e.Handled = true;
+        }
+
         private void CardPanelMouseUp(object sender, MouseEventArgs e)
         {
-            if (!AllowSelection || e.Button != MouseButtons.Right || CardSelected == null)
+            if (e.Button != MouseButtons.Right)
             {
                 return;
             }
 
-            Button clickedButton = (sender as Button);
-            string cardIdentifier = clickedButton.Text;
+            ProcessCardSelection(sender as Button);
+        }
+
+        private void ProcessCardSelection(Button button)
+        {
+            if (!AllowSelection || CardSelected == null)
+            {
+                return;
+            }
+            
+            string cardIdentifier = button.Text;
             Card card = new Card(cardIdentifier);
             bool removeCard;
             CardSelected(card, out removeCard);
             if (removeCard)
             {
-                _cards.RemoveAt(pCards.Controls.IndexOf(clickedButton));
-                pCards.Controls.Remove(clickedButton);
+                _cards.RemoveAt(pCards.Controls.IndexOf(button));
+                pCards.Controls.Remove(button);
             }
         }
 

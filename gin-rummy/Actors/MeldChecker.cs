@@ -78,5 +78,7 @@ namespace gin_rummy.Actors
             return IsRun(m) || IsSet(m);
         }
 
+        // TODO: implement ability to check hands for possible melds
+
     }
 }
