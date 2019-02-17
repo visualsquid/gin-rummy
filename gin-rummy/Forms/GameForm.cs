@@ -28,10 +28,8 @@ namespace gin_rummy.Forms
             Close();
         }
 
-        private CardPanel InitialisePlayerCardPanel()
+        private void InitialisePlayerCardPanel(CardPanel p)
         {
-            CardPanel p = new CardPanel();
-
             if (Properties.Settings.Default.UseFourColourScheme)
             {
                 p.ColourScheme = new FourColourScheme();
@@ -51,19 +49,13 @@ namespace gin_rummy.Forms
             p.ShowCards = true;
             p.AllowReordering = true;
             p.AllowSelection = true;
-
-            return p;
         }
 
-        private CardPanel InitialiseOpponentCardPanel()
+        private void InitialiseOpponentCardPanel(CardPanel p)
         {
-            CardPanel p = new CardPanel();
-
             p.ShowCards = false;
             p.AllowReordering = false;
             p.AllowSelection = false;
-
-            return p;
         }
 
         private void CardPanelCardSelected(Card card, out bool removeCard)
@@ -75,15 +67,11 @@ namespace gin_rummy.Forms
         private void randomplayCPUToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // TODO: Implement random play CPU game
-            pYourHand.Controls.Clear();
-            CardPanel yourCards = InitialisePlayerCardPanel();
-            pYourHand.Controls.Add(yourCards);
-            yourCards.Dock = DockStyle.Fill;
+            pYourHand.Clear();
+            InitialisePlayerCardPanel(pYourHand);
 
-            pOpponentsHand.Controls.Clear();
-            CardPanel opponentsCards = InitialiseOpponentCardPanel();
-            pOpponentsHand.Controls.Add(opponentsCards);
-            opponentsCards.Dock = DockStyle.Fill;
+            pOpponentsHand.Clear();
+            InitialiseOpponentCardPanel(pOpponentsHand);
 
             Deck deck = new Deck();
             deck.Shuffle();
@@ -91,8 +79,8 @@ namespace gin_rummy.Forms
             int i = 10;
             while (i-- > 0)
             {
-                yourCards.AddCard(deck.RemoveTop());
-                opponentsCards.AddCard(deck.RemoveTop());
+                pYourHand.AddCard(deck.RemoveTop());
+                pOpponentsHand.AddCard(deck.RemoveTop());
             }
         }
 

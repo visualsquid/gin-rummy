@@ -63,6 +63,12 @@
     <Compile Include="Controls\CardPanel.Designer.cs">
       <DependentUpon>CardPanel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\PlayerActions.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\PlayerActions.Designer.cs">
+      <DependentUpon>PlayerActions.cs</DependentUpon>
+    </Compile>
     <Compile Include="GameStructures\Game.cs" />
     <Compile Include="GameStructures\Hand.cs" />
     <Compile Include="GameStructures\Meld.cs" />
@@ -79,8 +85,12 @@
     <EmbeddedResource Include="Controls\CardPanel.resx">
       <DependentUpon>CardPanel.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\PlayerActions.resx">
+      <DependentUpon>PlayerActions.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\GameForm.resx">
       <DependentUpon>GameForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

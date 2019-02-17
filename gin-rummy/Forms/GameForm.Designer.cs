@@ -28,24 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.pYourHand = new System.Windows.Forms.Panel();
+            gin_rummy.Cards.TwoColourScheme twoColourScheme1 = new gin_rummy.Cards.TwoColourScheme();
+            gin_rummy.Cards.TwoColourScheme twoColourScheme2 = new gin_rummy.Cards.TwoColourScheme();
             this.mnMain = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.gameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newCPUGameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.randomplayCPUToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.pOpponentsHand = new System.Windows.Forms.Panel();
+            this.pYourHand = new gin_rummy.Controls.CardPanel();
+            this.pOpponentsHand = new gin_rummy.Controls.CardPanel();
+            this.playerActions1 = new gin_rummy.Controls.PlayerActions();
             this.mnMain.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // pYourHand
-            // 
-            this.pYourHand.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pYourHand.Location = new System.Drawing.Point(0, 256);
-            this.pYourHand.Name = "pYourHand";
-            this.pYourHand.Size = new System.Drawing.Size(673, 76);
-            this.pYourHand.TabIndex = 0;
             // 
             // mnMain
             // 
@@ -54,7 +49,7 @@
             this.gameToolStripMenuItem});
             this.mnMain.Location = new System.Drawing.Point(0, 0);
             this.mnMain.Name = "mnMain";
-            this.mnMain.Size = new System.Drawing.Size(673, 24);
+            this.mnMain.Size = new System.Drawing.Size(776, 24);
             this.mnMain.TabIndex = 1;
             this.mnMain.Text = "menuStrip1";
             // 
@@ -96,21 +91,56 @@
             this.randomplayCPUToolStripMenuItem.Text = "Random-play CPU";
             this.randomplayCPUToolStripMenuItem.Click += new System.EventHandler(this.randomplayCPUToolStripMenuItem_Click);
             // 
+            // pYourHand
+            // 
+            this.pYourHand.AllowReordering = false;
+            this.pYourHand.AllowSelection = false;
+            this.pYourHand.CardSelected = null;
+            this.pYourHand.ColourMap = null;
+            this.pYourHand.ColourScheme = twoColourScheme1;
+            this.pYourHand.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.pYourHand.Location = new System.Drawing.Point(0, 249);
+            this.pYourHand.Name = "pYourHand";
+            this.pYourHand.ShowCards = false;
+            this.pYourHand.Size = new System.Drawing.Size(623, 83);
+            this.pYourHand.TabIndex = 3;
+            // 
             // pOpponentsHand
             // 
+            this.pOpponentsHand.AllowReordering = false;
+            this.pOpponentsHand.AllowSelection = false;
+            this.pOpponentsHand.CardSelected = null;
+            this.pOpponentsHand.ColourMap = null;
+            this.pOpponentsHand.ColourScheme = twoColourScheme2;
             this.pOpponentsHand.Dock = System.Windows.Forms.DockStyle.Top;
             this.pOpponentsHand.Location = new System.Drawing.Point(0, 24);
             this.pOpponentsHand.Name = "pOpponentsHand";
-            this.pOpponentsHand.Size = new System.Drawing.Size(673, 78);
-            this.pOpponentsHand.TabIndex = 2;
+            this.pOpponentsHand.ShowCards = false;
+            this.pOpponentsHand.Size = new System.Drawing.Size(623, 83);
+            this.pOpponentsHand.TabIndex = 4;
+            // 
+            // playerActions1
+            // 
+            this.playerActions1.AllowDraw = false;
+            this.playerActions1.AllowKnock = false;
+            this.playerActions1.AllowTake = false;
+            this.playerActions1.Dock = System.Windows.Forms.DockStyle.Right;
+            this.playerActions1.Location = new System.Drawing.Point(623, 24);
+            this.playerActions1.Name = "playerActions1";
+            this.playerActions1.OnDraw = null;
+            this.playerActions1.OnKnock = null;
+            this.playerActions1.OnTake = null;
+            this.playerActions1.Size = new System.Drawing.Size(153, 308);
+            this.playerActions1.TabIndex = 5;
             // 
             // GameForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(673, 332);
+            this.ClientSize = new System.Drawing.Size(776, 332);
             this.Controls.Add(this.pOpponentsHand);
             this.Controls.Add(this.pYourHand);
+            this.Controls.Add(this.playerActions1);
             this.Controls.Add(this.mnMain);
             this.MainMenuStrip = this.mnMain;
             this.Name = "GameForm";
@@ -124,14 +154,14 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.Panel pYourHand;
         private System.Windows.Forms.MenuStrip mnMain;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem gameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newCPUGameToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem randomplayCPUToolStripMenuItem;
-        private System.Windows.Forms.Panel pOpponentsHand;
+        private Controls.CardPanel pYourHand;
+        private Controls.CardPanel pOpponentsHand;
+        private Controls.PlayerActions playerActions1;
     }
 }

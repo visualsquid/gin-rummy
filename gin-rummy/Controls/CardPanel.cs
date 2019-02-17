@@ -37,6 +37,12 @@ namespace gin_rummy.Controls
             InitialiseDefaultProperties();
         }
 
+        public void Clear()
+        {
+            pCards.Controls.Clear();
+            _cards.Clear();
+        }
+
         private void InitialiseDefaultProperties()
         {
             ColourScheme = new TwoColourScheme();
