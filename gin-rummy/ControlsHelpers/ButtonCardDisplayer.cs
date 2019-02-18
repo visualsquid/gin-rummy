@@ -70,6 +70,7 @@ namespace gin_rummy.ControlsHelpers
         {
             SetButtonSize(button);
             button.Text = "";
+            button.BackColor = Color.LightGray; // TODO: variablise nothing display
         }
     }
 }

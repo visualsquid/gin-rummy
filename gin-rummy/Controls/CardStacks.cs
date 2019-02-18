@@ -25,7 +25,14 @@ namespace gin_rummy.Controls
         private Button _discardDisplay;
 
 
+        public delegate void OnTakeDiscard();
+        public delegate void OnDrawStock();
+
         public SuitColourScheme SuitColourScheme { get; set; }
+        public bool AllowTakeDiscard { get; set; }
+        public OnTakeDiscard DiscardTaken { get; set; }
+        public bool AllowDrawStock { get; set; }
+        public OnDrawStock StockDrawn { get; set; }
         public int StockCount
         {
             get
@@ -81,13 +88,32 @@ namespace gin_rummy.Controls
         private void InitialiseStacksDisplay()
         {
             _stockDisplay = new Button();
+            _stockDisplay.Click += StockClick;
+            
             _discardDisplay = new Button();
+            _discardDisplay.Click += DiscardClick;
 
             pStacks.Controls.Add(_discardDisplay);
             pStacks.Controls.Add(_stockDisplay);
 
             _visibleDiscard = null;
             _stockCount = 0;
+        }
+
+        private void StockClick(object sender, EventArgs e)
+        {
+            if (AllowDrawStock)
+            {
+                StockDrawn?.Invoke();
+            }
+        }
+
+        private void DiscardClick(object sender, EventArgs e)
+        {
+            if (AllowTakeDiscard)
+            {
+                DiscardTaken?.Invoke();
+            }
         }
 
         private void InitialiseDefaultPropertyValues()
@@ -110,7 +136,7 @@ namespace gin_rummy.Controls
 
         private void DisplayVisibleDiscard(Card card, int discardCount)
         {
-            if (discardCount == 0)
+            if (discardCount == 0 || card == null)
             {
                 _cardDisplayer.DisplayNothing(_discardDisplay);
             }

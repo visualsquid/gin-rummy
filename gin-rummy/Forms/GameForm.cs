@@ -17,6 +17,7 @@ namespace gin_rummy.Forms
     public partial class GameForm : Form
     {
         private Game _game;
+        private Deck _deck;
 
         public GameForm()
         {
@@ -55,8 +56,38 @@ namespace gin_rummy.Forms
         private void InitialiseStacks(int stockCount)
         {
             pStacks.StockCount = stockCount;
-            pStacks.DiscardCount = 0;
-            pStacks.VisibleDiscard = null;
+            pStacks.DiscardCount = 1;
+            pStacks.VisibleDiscard = _deck.RemoveTop();
+            pStacks.AllowDrawStock = true;
+            pStacks.StockDrawn = StacksEventStockDrawn;
+            pStacks.AllowTakeDiscard = true;
+            pStacks.DiscardTaken = StacksEventDiscardTaken;
+        }
+
+        private void InitialisePlayerActions()
+        {
+            pActions.AllowTake = true;
+            pActions.OnTake += StacksEventDiscardTaken;
+            pActions.AllowDraw = true;
+            pActions.OnDraw += StacksEventStockDrawn;
+        }
+
+        private void StacksEventStockDrawn()
+        {
+            if (pStacks.StockCount > 0)
+            {
+                pStacks.StockCount--;
+                MessageBox.Show($"New stock count = {pStacks.StockCount}");
+            }
+        }
+
+        private void StacksEventDiscardTaken()
+        {
+            if (pStacks.DiscardCount > 0)
+            {
+                pStacks.DiscardCount--;
+                MessageBox.Show($"New discard count = {pStacks.DiscardCount}");
+            }
         }
 
         private void CardPanelCardSelected(Card card, out bool removeCard)
@@ -70,21 +101,22 @@ namespace gin_rummy.Forms
             // TODO: Implement random play CPU game
             pYourHand.Clear();
             InitialisePlayerCardPanel(pYourHand);
-
+            
             pOpponentsHand.Clear();
             InitialiseOpponentCardPanel(pOpponentsHand);
 
-            Deck deck = new Deck();
-            deck.Shuffle();
+            _deck = new Deck();
+            _deck.Shuffle();
 
             int i = 10;
             while (i-- > 0)
             {
-                pYourHand.AddCard(deck.RemoveTop());
-                pOpponentsHand.AddCard(deck.RemoveTop());
+                pYourHand.AddCard(_deck.RemoveTop());
+                pOpponentsHand.AddCard(_deck.RemoveTop());
             }
 
-            InitialiseStacks(deck.Size);
+            InitialiseStacks(_deck.Size);
+            InitialisePlayerActions();
         }
 
 

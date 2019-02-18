@@ -40,7 +40,7 @@
             this.pStacks = new gin_rummy.Controls.CardStacks();
             this.pOpponentsHand = new gin_rummy.Controls.CardPanel();
             this.pYourHand = new gin_rummy.Controls.CardPanel();
-            this.playerActions1 = new gin_rummy.Controls.PlayerActions();
+            this.pActions = new gin_rummy.Controls.PlayerActions();
             this.mnMain.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -95,12 +95,16 @@
             // 
             // pStacks
             // 
+            this.pStacks.AllowDrawStock = false;
+            this.pStacks.AllowTakeDiscard = false;
             this.pStacks.DiscardCount = 0;
+            this.pStacks.DiscardTaken = null;
             this.pStacks.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pStacks.Location = new System.Drawing.Point(0, 107);
             this.pStacks.Name = "pStacks";
             this.pStacks.Size = new System.Drawing.Size(629, 70);
             this.pStacks.StockCount = 0;
+            this.pStacks.StockDrawn = null;
             this.pStacks.SuitColourScheme = twoColourScheme1;
             this.pStacks.TabIndex = 6;
             this.pStacks.VisibleDiscard = null;
@@ -131,19 +135,19 @@
             this.pYourHand.Size = new System.Drawing.Size(629, 83);
             this.pYourHand.TabIndex = 3;
             // 
-            // playerActions1
+            // pActions
             // 
-            this.playerActions1.AllowDraw = false;
-            this.playerActions1.AllowKnock = false;
-            this.playerActions1.AllowTake = false;
-            this.playerActions1.Dock = System.Windows.Forms.DockStyle.Right;
-            this.playerActions1.Location = new System.Drawing.Point(629, 24);
-            this.playerActions1.Name = "playerActions1";
-            this.playerActions1.OnDraw = null;
-            this.playerActions1.OnKnock = null;
-            this.playerActions1.OnTake = null;
-            this.playerActions1.Size = new System.Drawing.Size(147, 236);
-            this.playerActions1.TabIndex = 5;
+            this.pActions.AllowDraw = false;
+            this.pActions.AllowKnock = false;
+            this.pActions.AllowTake = false;
+            this.pActions.Dock = System.Windows.Forms.DockStyle.Right;
+            this.pActions.Location = new System.Drawing.Point(629, 24);
+            this.pActions.Name = "pActions";
+            this.pActions.OnDraw = null;
+            this.pActions.OnKnock = null;
+            this.pActions.OnTake = null;
+            this.pActions.Size = new System.Drawing.Size(147, 236);
+            this.pActions.TabIndex = 5;
             // 
             // GameForm
             // 
@@ -153,7 +157,7 @@
             this.Controls.Add(this.pStacks);
             this.Controls.Add(this.pOpponentsHand);
             this.Controls.Add(this.pYourHand);
-            this.Controls.Add(this.playerActions1);
+            this.Controls.Add(this.pActions);
             this.Controls.Add(this.mnMain);
             this.MainMenuStrip = this.mnMain;
             this.Name = "GameForm";
@@ -175,7 +179,7 @@
         private System.Windows.Forms.ToolStripMenuItem randomplayCPUToolStripMenuItem;
         private Controls.CardPanel pYourHand;
         private Controls.CardPanel pOpponentsHand;
-        private Controls.PlayerActions playerActions1;
+        private Controls.PlayerActions pActions;
         private Controls.CardStacks pStacks;
     }
 }
