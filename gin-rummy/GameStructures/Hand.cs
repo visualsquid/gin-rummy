@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace gin_rummy.Cards
 {
-    class Hand
+    public class Hand
     {
         private List<Card> _cards;
 
@@ -20,6 +20,7 @@ namespace gin_rummy.Cards
         public List<Card> ViewHand()
         {
             var cards = new List<Card>();
+            // TODO: clone cards
             cards.AddRange(_cards);
 
             return cards;

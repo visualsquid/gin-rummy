@@ -1,4 +1,5 @@
-﻿using gin_rummy.Cards;
+﻿using gin_rummy.Actors;
+using gin_rummy.Cards;
 using gin_rummy.Controls;
 using gin_rummy.GameStructures;
 using System;
@@ -18,6 +19,7 @@ namespace gin_rummy.Forms
     {
         private Game _game;
         private Deck _deck;
+        private GameMaster _gameMaster;
 
         public GameForm()
         {
@@ -123,9 +125,16 @@ namespace gin_rummy.Forms
         private void GameForm_Shown(object sender, EventArgs e)
         {
             // TODO: remove auto-game start (for testing only)
-            randomplayCPUToolStripMenuItem_Click(sender, e);
+            //randomplayCPUToolStripMenuItem_Click(sender, e);
+            _gameMaster = new GameMaster(new RandomCPUPlayer("Teddy"), new RandomCPUPlayer("Dave"));
+            _gameMaster.GameFinished = new EventHandler(TestGameFinished);
+            _gameMaster.StartGame();
         }
 
+        private void TestGameFinished(object sender, EventArgs e)
+        {
+            MessageBox.Show(string.Join("\n", _gameMaster.Log));
+        }
         
     }
 }

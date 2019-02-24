@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 
 namespace gin_rummy.Actors
 {
-    interface IPlayer
+    public interface IPlayer
     {
         int HandSize { get; }
+        string Name { get; set; }
 
+        void YourTurn(GameMaster gm);
         void DrawCard(Card c);
         bool DiscardCard(Card c);
         void ClearHand();

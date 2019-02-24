@@ -46,6 +46,21 @@ namespace gin_rummy.Cards
             return RemoveAt(_cards.Count - 1);
         }
 
+        public List<Card> RemoveTop(int count)
+        {
+            var cards = new List<Card>();
+            while (count-- > 0)
+            {
+                cards.Add(RemoveTop());
+            }
+            return cards;
+        }
+
+        public List<Card> RemoveAll()
+        {
+            return RemoveTop(Size);
+        }
+
         public Card PeekBottom()
         {
             return PeekAt(0);
@@ -54,6 +69,16 @@ namespace gin_rummy.Cards
         public Card RemoveBottom()
         {
             return RemoveAt(0);
+        }
+
+        public List<Card> RemoveBottom(int count)
+        {
+            var cards = new List<Card>();
+            while (count-- > 0)
+            {
+                cards.Add(RemoveBottom());
+            }
+            return cards;
         }
 
         public Card PeekAt(int i)

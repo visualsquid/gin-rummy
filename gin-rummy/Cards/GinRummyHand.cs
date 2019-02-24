@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace gin_rummy.Cards
 {
-    class GinRummyHand : Hand
+    public class GinRummyHand : Hand
     {
 
-        public const int MaxSize = 14;
+        public const int MaxSize = 11;
 
         public GinRummyHand() { }
 

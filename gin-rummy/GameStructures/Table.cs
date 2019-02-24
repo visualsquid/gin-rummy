@@ -22,6 +22,12 @@ namespace gin_rummy.Cards
             _discards = new Deck(Deck.DeckType.Empty);
         }
 
+        public void ClearTable()
+        {
+            _stock.Clear();
+            _discards.Clear();
+        }
+
         public Card DrawStock()
         {
             return _stock.RemoveTop();

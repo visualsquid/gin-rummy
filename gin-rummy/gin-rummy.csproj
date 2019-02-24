@@ -46,9 +46,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actors\DeadWoodScorer.cs" />
+    <Compile Include="Actors\GameMaster.cs" />
+    <Compile Include="Actors\HumanPlayerGUIBased.cs" />
     <Compile Include="Actors\IPlayer.cs" />
     <Compile Include="Actors\MeldChecker.cs" />
     <Compile Include="Actors\Player.cs" />
+    <Compile Include="Actors\RandomCPUPlayer.cs" />
     <Compile Include="Cards\Card.cs" />
     <Compile Include="Cards\Deck.cs" />
     <Compile Include="Cards\FourColourScheme.cs" />
