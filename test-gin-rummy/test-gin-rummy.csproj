@@ -55,6 +55,7 @@
     <Compile Include="TestLogic\TestMeldRuns.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestLogic\TestDeadWoodPenalties.cs" />
+    <Compile Include="TestLogic\TestMeldChecker.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

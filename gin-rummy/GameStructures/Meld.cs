@@ -38,6 +38,14 @@ namespace gin_rummy.Cards
         {
             return new List<Card>(_cards);
         }
+
+        public bool DoesOverlap(Meld other)
+        {
+            var theseCards = this.GetListOfCardsInMeld().Select(i => i.ToString());
+            var otherCards = other.GetListOfCardsInMeld().Select(i => i.ToString());
+
+            return theseCards.Intersect(otherCards).Count() > 0;
+        }
     }
 
 }

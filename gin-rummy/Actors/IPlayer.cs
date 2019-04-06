@@ -13,6 +13,8 @@ namespace gin_rummy.Actors
         string Name { get; set; }
 
         void YourTurn(GameMaster gm);
+        void RequestMelds(GameMaster gm);
+        void RequestLayOffs(GameMaster gm, List<Meld> otherPlayerMelds);
         void DrawCard(Card c);
         bool DiscardCard(Card c);
         void ClearHand();

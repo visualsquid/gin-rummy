@@ -20,13 +20,23 @@ namespace gin_rummy.Actors
             LayOffInvalid
         }
 
+        private class PlayerResults
+        {
+            public Player Player { get; set; }
+            public List<Meld> Melds { get; set; }
+            public List<Card> DeadWood { get; set; }
+        }
+
         private Thread _turnHandler;
         private Thread _endGameHandler;
+        private Thread _layOffsHandler;
+
         private Game _game;
         private DeadWoodScorer _deadWoodScorer;
         private MeldChecker _meldChecker;
 
         private Player _currentPlayer;
+        private List<PlayerResults> _playerResults;
 
         public List<string> Log { get; }
         public EventHandler GameFinished { get; set; }
@@ -34,6 +44,9 @@ namespace gin_rummy.Actors
         public GameMaster(Player playerOne, Player playerTwo)
         {
             Log = new List<string>();
+            _playerResults = new List<PlayerResults>();
+            _playerResults.Add(new PlayerResults() { Player = playerOne });
+            _playerResults.Add(new PlayerResults() { Player = playerTwo });
             _game = new Game(playerOne, playerTwo);
             _deadWoodScorer = new DeadWoodScorer();
             _meldChecker = new MeldChecker();
@@ -65,6 +78,12 @@ namespace gin_rummy.Actors
             _endGameHandler.Start();
         }
 
+        private void StartLayOffs()
+        {
+            _layOffsHandler = new Thread(new ThreadStart(HandleLayOffs));
+            _layOffsHandler.Start();
+        }
+
         private void HandleTurns()
         {
             if (_currentPlayer == null || _currentPlayer == _game.PlayerTwo)
@@ -80,12 +99,14 @@ namespace gin_rummy.Actors
 
         private void HandleEndGame()
         {
-            // TODO: implement end game
-            Log.Add("Game ends.");
-            if (GameFinished != null)
-            {
-                GameFinished(this, new EventArgs());
-            }
+            _currentPlayer.RequestMelds(this);
+        }
+
+        private void HandleLayOffs()
+        {
+            Player finalPlayer = _currentPlayer == _game.PlayerOne ? _game.PlayerTwo : _game.PlayerOne;
+            PlayerResults currentPlayerResults = _playerResults.First(i => i.Player == _currentPlayer);
+            finalPlayer.RequestLayOffs(this, currentPlayerResults.Melds);
         }
 
         private void LogKnock(string playerName)
@@ -133,6 +154,7 @@ namespace gin_rummy.Actors
             {
                 return false;
             }
+            else
             {
                 drawnCard = _game.DrawDiscard();
                 player.DrawCard(drawnCard);
@@ -179,6 +201,43 @@ namespace gin_rummy.Actors
                 StartTurn();
                 return true;
             }
+        }
+
+        public bool RequestSetMelds(Player player, List<Meld> melds, List<Card> deadWood, out string error, out Meld invalidMeld)
+        {
+            invalidMeld = null;
+
+            if (!ValidateCurrentPlayer(player, out error))
+            {
+                return false;
+            }
+            else if (melds == null)
+            {
+                error = "Meld list reference is null.";
+                return false;
+            }
+            else if (deadWood == null)
+            {
+                error = "Dead wood list reference is null.";
+                return false;
+            }
+
+            foreach (Meld meld in melds)
+            {
+                if (!_meldChecker.IsValid(meld))
+                {
+                    invalidMeld = meld;
+                    error = "Meld is invalid.";
+                    return false;
+                }
+            }
+
+            var relevantResults = _playerResults.First(i => i.Player == player);
+            relevantResults.Melds = melds;
+            relevantResults.DeadWood = deadWood;
+            // TODO: add log
+            StartLayOffs();
+            return true;
         }
 
         private bool CanKnock(Hand hand)

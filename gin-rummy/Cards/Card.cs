@@ -79,6 +79,18 @@ namespace gin_rummy.Cards
             return this.SuitValue == other.SuitValue && this.RankValue == other.RankValue;
         }
 
+        public override bool Equals(Object obj)
+        {
+            if (obj is Card)
+            {
+                return this.IsEqual((obj as Card));
+            }
+            else
+            {
+                return base.Equals(obj);
+            }
+        }
+
         public override string ToString()
         {
             string rank = _stringsToRanks.First(i => i.Value == RankValue).Key;

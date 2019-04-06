@@ -88,5 +88,48 @@ namespace test_gin_rummy.Cards
             Assert.AreEqual(InitialMeldSize + 3 - 1, _currentMeld.Size);
             Assert.IsFalse(_currentMeld.GetListOfCardsInMeld().Contains(y));
         }
+
+        [TestMethod]
+        public void TestDoMeldsOverlapNegativeEmpty()
+        {
+            Meld meldA = new Meld();
+            Meld meldB = new Meld();
+
+            Assert.IsFalse(meldA.DoesOverlap(meldB));
+        }
+
+        [TestMethod]
+        public void TestDoMeldsOverlapNegativeSeparate()
+        {
+            Meld meldA = new Meld();
+            Meld meldB = new Meld();
+
+            meldA.AddCard(new Card("Ah"));
+            meldA.AddCard(new Card("As"));
+            meldA.AddCard(new Card("Ac"));
+
+            meldB.AddCard(new Card("Kh"));
+            meldB.AddCard(new Card("Ks"));
+            meldB.AddCard(new Card("Kc"));
+
+            Assert.IsFalse(meldA.DoesOverlap(meldB));
+        }
+
+        [TestMethod]
+        public void TestDoMeldsOverlapPositive()
+        {
+            Meld meldA = new Meld();
+            Meld meldB = new Meld();
+
+            meldA.AddCard(new Card("Ah"));
+            meldA.AddCard(new Card("As"));
+            meldA.AddCard(new Card("Ac"));
+
+            meldB.AddCard(new Card("Ah"));
+            meldB.AddCard(new Card("As"));
+            meldB.AddCard(new Card("Ad"));
+
+            Assert.IsTrue(meldA.DoesOverlap(meldB));
+        }
     }
 }

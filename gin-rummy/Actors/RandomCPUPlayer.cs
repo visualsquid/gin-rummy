@@ -94,5 +94,32 @@ namespace gin_rummy.Actors
             }
 
         }
+
+        protected override void ThreadedRequestMelds()
+        {
+            // TODO: implement random CPU get melds
+            var cardsInHand = this._hand.ViewHand();
+            var possibleMeldSets = _meldChecker.GetAllPossibleMeldSets(cardsInHand);
+            List<Meld> meldSet;
+            if (possibleMeldSets.Count == 0)
+            {
+                meldSet = new List<Meld>();
+            }
+            else
+            {
+                meldSet = possibleMeldSets[_random.Next(possibleMeldSets.Count)];
+            }
+            var deadWood = _meldChecker.GetDeadWood(meldSet, cardsInHand);
+            string error;
+            Meld invalidMeld;
+            _gameMaster.RequestSetMelds(this, meldSet, deadWood, out error, out invalidMeld);
+        }
+
+        protected override void ThreadedRequestLayOffs()
+        {
+            // TODO: implement random CPU get lay offs
+            //_gameMaster.?
+            throw new NotImplementedException();
+        }
     }
 }

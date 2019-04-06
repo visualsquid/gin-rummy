@@ -71,5 +71,6 @@ namespace test_gin_rummy.Cards
 
             Assert.IsTrue(_checker.IsSet(_currentMeld));
         }
+
     }
 }

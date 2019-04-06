@@ -12,6 +12,16 @@ namespace gin_rummy.Actors
         {
         }
 
+        protected override void ThreadedRequestLayOffs()
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void ThreadedRequestMelds()
+        {
+            throw new NotImplementedException();
+        }
+
         protected override void ThreadedYourTurn()
         {
             throw new NotImplementedException();
