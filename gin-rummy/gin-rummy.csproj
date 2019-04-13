@@ -47,6 +47,8 @@
   <ItemGroup>
     <Compile Include="Actors\DeadWoodScorer.cs" />
     <Compile Include="Actors\GameMaster.cs" />
+    <Compile Include="Actors\GUIController.cs" />
+    <Compile Include="Actors\GUIControllerFormsA.cs" />
     <Compile Include="Actors\HumanPlayerGUIBased.cs" />
     <Compile Include="Actors\IPlayer.cs" />
     <Compile Include="Actors\MeldChecker.cs" />

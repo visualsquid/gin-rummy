@@ -51,7 +51,7 @@
             this.gameToolStripMenuItem});
             this.mnMain.Location = new System.Drawing.Point(0, 0);
             this.mnMain.Name = "mnMain";
-            this.mnMain.Size = new System.Drawing.Size(776, 24);
+            this.mnMain.Size = new System.Drawing.Size(913, 24);
             this.mnMain.TabIndex = 1;
             this.mnMain.Text = "menuStrip1";
             // 
@@ -102,7 +102,7 @@
             this.pStacks.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pStacks.Location = new System.Drawing.Point(0, 107);
             this.pStacks.Name = "pStacks";
-            this.pStacks.Size = new System.Drawing.Size(629, 70);
+            this.pStacks.Size = new System.Drawing.Size(766, 70);
             this.pStacks.StockCount = 0;
             this.pStacks.StockDrawn = null;
             this.pStacks.SuitColourScheme = twoColourScheme1;
@@ -119,7 +119,7 @@
             this.pOpponentsHand.Location = new System.Drawing.Point(0, 24);
             this.pOpponentsHand.Name = "pOpponentsHand";
             this.pOpponentsHand.ShowCards = false;
-            this.pOpponentsHand.Size = new System.Drawing.Size(629, 83);
+            this.pOpponentsHand.Size = new System.Drawing.Size(766, 83);
             this.pOpponentsHand.TabIndex = 4;
             // 
             // pYourHand
@@ -132,7 +132,7 @@
             this.pYourHand.Location = new System.Drawing.Point(0, 177);
             this.pYourHand.Name = "pYourHand";
             this.pYourHand.ShowCards = false;
-            this.pYourHand.Size = new System.Drawing.Size(629, 83);
+            this.pYourHand.Size = new System.Drawing.Size(766, 83);
             this.pYourHand.TabIndex = 3;
             // 
             // pActions
@@ -141,7 +141,7 @@
             this.pActions.AllowKnock = false;
             this.pActions.AllowTake = false;
             this.pActions.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pActions.Location = new System.Drawing.Point(629, 24);
+            this.pActions.Location = new System.Drawing.Point(766, 24);
             this.pActions.Name = "pActions";
             this.pActions.OnDraw = null;
             this.pActions.OnKnock = null;
@@ -153,7 +153,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(776, 260);
+            this.ClientSize = new System.Drawing.Size(913, 260);
             this.Controls.Add(this.pStacks);
             this.Controls.Add(this.pOpponentsHand);
             this.Controls.Add(this.pYourHand);

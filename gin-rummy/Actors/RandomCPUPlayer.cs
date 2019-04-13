@@ -83,7 +83,6 @@ namespace gin_rummy.Actors
                         break;
                     case TicketType.DrawDiscard:
                         success = (_gameMaster.RequestDrawDiscard(this, out drawnCard, out error) && _gameMaster.RequestPlaceDiscard(this, GetRandomCardFromHand(), out error));
-                        
                         break;
                     case TicketType.DrawStock:
                         success = (_gameMaster.RequestDrawStock(this, out drawnCard, out error) && _gameMaster.RequestPlaceDiscard(this, GetRandomCardFromHand(), out error));

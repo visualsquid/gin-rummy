@@ -8,6 +8,8 @@ namespace gin_rummy.Cards
 {
     public class Card
     {
+        private static readonly Random _random = new Random();
+
         private Dictionary<string, Suit> _stringsToSuits;
         private Dictionary<string, Rank> _stringsToRanks;
 
@@ -101,20 +103,16 @@ namespace gin_rummy.Cards
 
         public static Rank GetRandomRank()
         {
-            // TODO: fix randomness of ranks
-            Random random = new Random();
-            int next = random.Next(Enum.GetValues(typeof(Rank)).Length);
+            int next = _random.Next(Enum.GetValues(typeof(Rank)).Length);
 
             return (Rank)next;
         }
 
         public static Suit GetRandomSuit()
         {
-            // TODO: fix randomness of suits
             Array availableValues = Enum.GetValues(typeof(Suit));
             IEnumerable<Suit> convertedValues = availableValues.Cast<Suit>();
-            Random random = new Random();
-            int next = random.Next(availableValues.Length);
+            int next = _random.Next(availableValues.Length);
 
             return convertedValues.ElementAt(next);
         }

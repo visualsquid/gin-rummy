@@ -135,6 +135,6 @@ namespace gin_rummy.Forms
         {
             MessageBox.Show(string.Join("\n", _gameMaster.Log));
         }
-        
+
     }
 }
