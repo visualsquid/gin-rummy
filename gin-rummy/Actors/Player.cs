@@ -43,11 +43,17 @@ namespace gin_rummy.Actors
             return _hand.RemoveCard(c);
         }
 
+        public List<Card> GetCards()
+        {
+            return _hand.ViewHand();
+        }
+
         public void YourTurn(GameMaster gm)
         {
             _gameMaster = gm;
-            _yourTurn = new Thread(new ThreadStart(ThreadedYourTurn));
-            _yourTurn.Start();
+            //_yourTurn = new Thread(new ThreadStart(ThreadedYourTurn));
+            //_yourTurn.Start();
+            ThreadedYourTurn();
         }
 
         public void RequestMelds(GameMaster gm)

@@ -69,6 +69,33 @@ namespace gin_rummy.Controls
             AddCardToDisplay(c, ShowCards);
         }
 
+        public void RemoveCard(Card c)
+        {
+            _cards.Remove(c);
+            string cardIdentifier = c.ToString();
+            for (int i = 0; i < pCards.Controls.Count; i++)
+            {
+                if (pCards.Controls[i] is Button && (pCards.Controls[i] as Button).Text == cardIdentifier)
+                {
+                    pCards.Controls.RemoveAt(i);
+                    break;
+                }
+            }
+        }
+
+        public Card GetSelectedCard()
+        {
+            foreach (Control control in pCards.Controls)
+            {
+                if (control is Button && control.Focused)
+                {
+                    return new Card((control as Button).Text);
+                }
+            }
+
+            return null;
+        }
+
         private void AddCardToDisplay(Card card, bool showCards)
         {
 
@@ -187,6 +214,7 @@ namespace gin_rummy.Controls
             CardSelected(card, out removeCard);
             if (removeCard)
             {
+                // TODO: we're removing in RemoveCard(Card) as well...
                 _cards.RemoveAt(pCards.Controls.IndexOf(button));
                 pCards.Controls.Remove(button);
             }

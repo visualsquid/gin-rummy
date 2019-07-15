@@ -92,6 +92,10 @@
     <Compile Include="Forms\GameForm.Designer.cs">
       <DependentUpon>GameForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Messaging\GameMessage.cs" />
+    <Compile Include="Messaging\GameStatusMessage.cs" />
+    <Compile Include="Messaging\IGameMessageListener.cs" />
+    <Compile Include="Messaging\PlayerActionMessage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Controls\CardPanel.resx">

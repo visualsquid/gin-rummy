@@ -12,13 +12,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static gin_rummy.Cards.SuitColourScheme;
+using gin_rummy.Messaging;
 
 namespace gin_rummy.Forms
 {
-    public partial class GameForm : Form
+    public partial class GameForm : Form, IGameMessageListener
     {
         private Game _game;
-        private Deck _deck;
         private GameMaster _gameMaster;
 
         public GameForm()
@@ -55,23 +55,20 @@ namespace gin_rummy.Forms
             p.AllowSelection = false;
         }
 
-        private void InitialiseStacks(int stockCount)
+        private void InitialiseStacks(int stockCount, Card visibleDiscard)
         {
             pStacks.StockCount = stockCount;
             pStacks.DiscardCount = 1;
-            pStacks.VisibleDiscard = _deck.RemoveTop();
-            pStacks.AllowDrawStock = true;
+            pStacks.VisibleDiscard = visibleDiscard;
             pStacks.StockDrawn = StacksEventStockDrawn;
-            pStacks.AllowTakeDiscard = true;
             pStacks.DiscardTaken = StacksEventDiscardTaken;
         }
 
         private void InitialisePlayerActions()
         {
-            pActions.AllowTake = true;
             pActions.OnTake += StacksEventDiscardTaken;
-            pActions.AllowDraw = true;
             pActions.OnDraw += StacksEventStockDrawn;
+            pActions.OnDiscard += StacksEventDiscardPlaced;
         }
 
         private void StacksEventStockDrawn()
@@ -81,13 +78,8 @@ namespace gin_rummy.Forms
 
             if (!_gameMaster.RequestDrawStock(_gameMaster.CurrentPlayer, out drawnCard, out error))
             {
-                MessageBox.Show("Denied"); // TODO: what should we actually do here?
+                MessageBox.Show($"Denied: {error}"); // TODO: what should we actually do here?
             }
-            else
-            {
-                pStacks.StockCount--;
-            }
-            // TODO: now what?
         }
 
         private void StacksEventDiscardTaken()
@@ -97,45 +89,33 @@ namespace gin_rummy.Forms
 
             if (!_gameMaster.RequestDrawDiscard(_gameMaster.CurrentPlayer, out drawnCard, out error))
             {
-                MessageBox.Show("Denied"); // TODO: what should we actually do here?
+                MessageBox.Show($"Denied: {error}"); // TODO: what should we actually do here?
             }
-            else
+        }
+
+        private void StacksEventDiscardPlaced()
+        {
+            string error;
+
+            Card selectedCard = pYourHand.GetSelectedCard();
+            if (!_gameMaster.RequestPlaceDiscard(_gameMaster.CurrentPlayer, selectedCard, out error))
             {
-                pStacks.DiscardCount--;
-                pStacks.VisibleDiscard = _game.GetVisibleDiscard();
+                MessageBox.Show($"Denied: {error}"); // TODO: what should we actually do here?
             }
-            // TODO: now what?
         }
 
         private void CardPanelCardSelected(Card card, out bool removeCard)
         {
-            MessageBox.Show(card.ToString());
-            removeCard = true;
+            removeCard = false; // TODO: Get rid of this parameter?
+            StacksEventDiscardPlaced(); // TODO: Might not always want this action?
         }
 
         private void randomplayCPUToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _gameMaster = new GameMaster(new HumanPlayerGUIBased("Ya boi"), new RandomCPUPlayer("Dave"));
+            _game = _gameMaster.CurrentGame;
+            _gameMaster.RegisterGameMessageListener(this);
             _gameMaster.StartGame();
-            return;
-            pYourHand.Clear();
-            InitialisePlayerCardPanel(pYourHand);
-            
-            pOpponentsHand.Clear();
-            InitialiseOpponentCardPanel(pOpponentsHand);
-
-            _deck = new Deck();
-            _deck.Shuffle();
-
-            int i = 10;
-            while (i-- > 0)
-            {
-                pYourHand.AddCard(_deck.RemoveTop());
-                pOpponentsHand.AddCard(_deck.RemoveTop());
-            }
-
-            InitialiseStacks(_deck.Size);
-            InitialisePlayerActions();
         }
 
 
@@ -153,5 +133,89 @@ namespace gin_rummy.Forms
             MessageBox.Show(string.Join("\n", _gameMaster.Log));
         }
 
+        public void ReceiveMessage(GameMessage message)
+        {
+            HandleMessage(message);
+        }
+
+        private void HandleMessage(GameMessage message)
+        {
+            if (message is PlayerActionMessage)
+            {
+                PlayerActionMessage actionMessage = (PlayerActionMessage)message;
+                CardPanel relevantCardPanel = actionMessage.Player == _game.PlayerOne ? pYourHand : pOpponentsHand;
+                switch (actionMessage.PlayerActionValue)
+                {
+                    case PlayerActionMessage.PlayerAction.DrawDiscard:
+                        relevantCardPanel.AddCard(actionMessage.Card);
+                        pStacks.DiscardCount--;
+                        pStacks.VisibleDiscard = _game.GetVisibleDiscard();
+                        pActions.AllowDraw = false;
+                        pActions.AllowTake = false;
+                        pActions.AllowDiscard = true;
+                        break;
+                    case PlayerActionMessage.PlayerAction.DrawStock:
+                        pStacks.StockCount--;
+                        relevantCardPanel.AddCard(actionMessage.Card);
+                        pActions.AllowDraw = false;
+                        pActions.AllowTake = false;
+                        pActions.AllowDiscard = true;
+                        break;
+                    case PlayerActionMessage.PlayerAction.SetDiscard:
+                        pStacks.DiscardCount++;
+                        pStacks.VisibleDiscard = actionMessage.Card;
+                        relevantCardPanel.RemoveCard(actionMessage.Card);
+                        pActions.AllowDraw = false;
+                        pActions.AllowTake = false;
+                        pActions.AllowDiscard = false;
+                        break;
+                    case PlayerActionMessage.PlayerAction.Knock:
+                        // TODO: handle Knock message
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else if (message is GameStatusMessage)
+            {
+                GameStatusMessage statusMessage = (GameStatusMessage)message;
+                switch (statusMessage.GameStatusChangeValue)
+                {
+                    case GameStatusMessage.GameStatusChange.GameInitialised:
+                        // TODO: assumes PlayerOne is always the human player
+                        pYourHand.Clear();
+                        InitialisePlayerCardPanel(pYourHand);
+                        foreach (Card c in _game.PlayerOne.GetCards())
+                        {
+                            pYourHand.AddCard(c);
+                        }
+
+                        pOpponentsHand.Clear();
+                        InitialiseOpponentCardPanel(pOpponentsHand);
+                        foreach (Card c in _game.PlayerTwo.GetCards())
+                        {
+                            pOpponentsHand.AddCard(c);
+                        }
+
+                        InitialiseStacks(_game.GetStockCount(), _game.GetVisibleDiscard());
+                        InitialisePlayerActions();
+                        break;
+                    case GameStatusMessage.GameStatusChange.StartTurn:
+                        if (statusMessage.Player == _game.PlayerOne)
+                        {
+                            pActions.AllowTake = true;
+                            pActions.AllowDraw = true;
+                        }
+                        else
+                        {
+                            pActions.AllowTake = false;
+                            pActions.AllowDraw = false;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
     }
 }

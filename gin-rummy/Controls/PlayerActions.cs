@@ -17,10 +17,12 @@ namespace gin_rummy.Controls
 
         public OnPlayerAction OnKnock { get; set; }
         public OnPlayerAction OnTake { get; set; }
+        public OnPlayerAction OnDiscard { get; set; }
         public OnPlayerAction OnDraw { get; set; }
 
         public bool AllowKnock { get { return bKnock.Enabled; } set { bKnock.Enabled = value; } }
         public bool AllowTake { get { return bTake.Enabled; } set { bTake.Enabled = value; } }
+        public bool AllowDiscard { get { return bDiscard.Enabled; } set { bDiscard.Enabled = value; } }
         public bool AllowDraw { get { return bDraw.Enabled; } set { bDraw.Enabled = value; } }
 
         public PlayerActions()
@@ -33,6 +35,7 @@ namespace gin_rummy.Controls
         {
             AllowKnock = false;
             AllowTake = false;
+            AllowDiscard = false;
             AllowDraw = false;
         }
 
@@ -57,6 +60,14 @@ namespace gin_rummy.Controls
             if (AllowKnock && OnKnock != null)
             {
                 OnKnock();
+            }
+        }
+
+        private void bDiscard_Click(object sender, EventArgs e)
+        {
+            if (AllowDiscard && OnDiscard != null)
+            {
+                OnDiscard();
             }
         }
     }

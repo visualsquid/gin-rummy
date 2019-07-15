@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using gin_rummy.Messaging;
 
 namespace gin_rummy.Actors
 {
@@ -34,7 +35,7 @@ namespace gin_rummy.Actors
         private Thread _endGameHandler;
         private Thread _layOffsHandler;
 
-        private Game _game;
+        private HashSet<IGameMessageListener> _messageListeners;
         private DeadWoodScorer _deadWoodScorer;
         private MeldChecker _meldChecker;
 
@@ -43,36 +44,53 @@ namespace gin_rummy.Actors
         public List<string> Log { get; }
         public EventHandler GameFinished { get; set; }
         public Player CurrentPlayer { get; set; }
+        public Game CurrentGame { get; private set; }
 
         public GameMaster(Player playerOne, Player playerTwo)
         {
             Log = new List<string>();
+            _messageListeners = new HashSet<IGameMessageListener>();
             _playerResults = new List<PlayerResults>();
             _playerResults.Add(new PlayerResults() { Player = playerOne });
             _playerResults.Add(new PlayerResults() { Player = playerTwo });
-            _game = new Game(playerOne, playerTwo);
+            CurrentGame = new Game(playerOne, playerTwo);
             _deadWoodScorer = new DeadWoodScorer();
             _meldChecker = new MeldChecker();
-            InitialiseGame();
         }
 
         private void InitialiseGame()
         {
-            _game.ShuffleDeck();
-            _game.DealHand(_game.PlayerOne, Game.InitialHandSize);
-            _game.DealHand(_game.PlayerTwo, Game.InitialHandSize);
-            _game.CreateStacks();
+            CurrentGame.ShuffleDeck();
+            CurrentGame.DealHand(CurrentGame.PlayerOne, Game.InitialHandSize);
+            CurrentGame.DealHand(CurrentGame.PlayerTwo, Game.InitialHandSize);
+            CurrentGame.CreateStacks();
+            NotifyGameMessageListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.GameInitialised, null));
         }
 
         public void StartGame()
         {
+            InitialiseGame();
             StartTurn();
+        }
+
+        public void RegisterGameMessageListener(IGameMessageListener listener)
+        {
+            _messageListeners.Add(listener);
+        }
+
+        private void NotifyGameMessageListeners(GameMessage message)
+        {
+            foreach(IGameMessageListener listener in _messageListeners)
+            {
+                listener.ReceiveMessage(message);
+            }
         }
 
         private void StartTurn()
         {
-            _turnHandler = new Thread(new ThreadStart(HandleTurns));
-            _turnHandler.Start();
+            //_turnHandler = new Thread(new ThreadStart(HandleTurns));
+            //_turnHandler.Start();
+            HandleTurns();
         }
 
         private void StartEndGame()
@@ -89,15 +107,16 @@ namespace gin_rummy.Actors
 
         private void HandleTurns()
         {
-            if (CurrentPlayer == null || CurrentPlayer == _game.PlayerTwo)
+            if (CurrentPlayer == null || CurrentPlayer == CurrentGame.PlayerTwo)
             {
-                CurrentPlayer = _game.PlayerOne;
+                CurrentPlayer = CurrentGame.PlayerOne;
             }
-            else if (CurrentPlayer == _game.PlayerOne)
+            else if (CurrentPlayer == CurrentGame.PlayerOne)
             {
-                CurrentPlayer = _game.PlayerTwo;
+                CurrentPlayer = CurrentGame.PlayerTwo;
             }
             CurrentPlayer.YourTurn(this);
+            NotifyGameMessageListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartTurn, CurrentPlayer));
         }
 
         private void HandleEndGame()
@@ -107,7 +126,7 @@ namespace gin_rummy.Actors
 
         private void HandleLayOffs()
         {
-            Player finalPlayer = CurrentPlayer == _game.PlayerOne ? _game.PlayerTwo : _game.PlayerOne;
+            Player finalPlayer = CurrentPlayer == CurrentGame.PlayerOne ? CurrentGame.PlayerTwo : CurrentGame.PlayerOne;
             PlayerResults currentPlayerResults = _playerResults.First(i => i.Player == CurrentPlayer);
             finalPlayer.RequestLayOffs(this, currentPlayerResults.Melds);
         }
@@ -159,9 +178,10 @@ namespace gin_rummy.Actors
             }
             else
             {
-                drawnCard = _game.DrawDiscard();
+                drawnCard = CurrentGame.DrawDiscard();
                 player.DrawCard(drawnCard);
                 LogDrawDiscard(player.Name);
+                NotifyGameMessageListeners(new PlayerActionMessage(PlayerActionMessage.PlayerAction.DrawDiscard, player, drawnCard));
                 return true;
             }
         }
@@ -175,13 +195,14 @@ namespace gin_rummy.Actors
             }
             else
             {
-                drawnCard = _game.DrawStock();
+                drawnCard = CurrentGame.DrawStock();
                 player.DrawCard(drawnCard);
-                if (_game.GetStockCount() == 0)
+                if (CurrentGame.GetStockCount() == 0)
                 {
-                    _game.RestockFromDiscard();
+                    CurrentGame.RestockFromDiscard();
                 }
                 LogDrawStock(player.Name);
+                NotifyGameMessageListeners(new PlayerActionMessage(PlayerActionMessage.PlayerAction.DrawStock, player, drawnCard));
                 return true;
             }
         }
@@ -199,8 +220,9 @@ namespace gin_rummy.Actors
             }
             else
             {
-                _game.PlaceDiscard(discard);
+                CurrentGame.PlaceDiscard(discard);
                 LogPlaceDiscard(player.Name, discard.ToString());
+                NotifyGameMessageListeners(new PlayerActionMessage(PlayerActionMessage.PlayerAction.SetDiscard, player, discard));
                 StartTurn();
                 return true;
             }
@@ -269,7 +291,7 @@ namespace gin_rummy.Actors
 
         private bool ValidateDiscardsExist(out string error)
         {
-            if (_game.GetDiscardCount() == 0)
+            if (CurrentGame.GetDiscardCount() == 0)
             {
                 error = "Discard pile is empty.";
                 return false;

@@ -31,6 +31,7 @@
             this.bKnock = new System.Windows.Forms.Button();
             this.bTake = new System.Windows.Forms.Button();
             this.bDraw = new System.Windows.Forms.Button();
+            this.bDiscard = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // bKnock
@@ -63,10 +64,21 @@
             this.bDraw.UseVisualStyleBackColor = true;
             this.bDraw.Click += new System.EventHandler(this.bDraw_Click);
             // 
+            // bDiscard
+            // 
+            this.bDiscard.Location = new System.Drawing.Point(38, 76);
+            this.bDiscard.Name = "bDiscard";
+            this.bDiscard.Size = new System.Drawing.Size(75, 23);
+            this.bDiscard.TabIndex = 3;
+            this.bDiscard.Text = "Discard";
+            this.bDiscard.UseVisualStyleBackColor = true;
+            this.bDiscard.Click += new System.EventHandler(this.bDiscard_Click);
+            // 
             // PlayerActions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.bDiscard);
             this.Controls.Add(this.bDraw);
             this.Controls.Add(this.bTake);
             this.Controls.Add(this.bKnock);
@@ -81,5 +93,6 @@
         private System.Windows.Forms.Button bKnock;
         private System.Windows.Forms.Button bTake;
         private System.Windows.Forms.Button bDraw;
+        private System.Windows.Forms.Button bDiscard;
     }
 }
