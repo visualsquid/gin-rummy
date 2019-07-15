@@ -76,20 +76,35 @@ namespace gin_rummy.Forms
 
         private void StacksEventStockDrawn()
         {
-            if (pStacks.StockCount > 0)
+            Card drawnCard;
+            string error;
+
+            if (!_gameMaster.RequestDrawStock(_gameMaster.CurrentPlayer, out drawnCard, out error))
+            {
+                MessageBox.Show("Denied"); // TODO: what should we actually do here?
+            }
+            else
             {
                 pStacks.StockCount--;
-                MessageBox.Show($"New stock count = {pStacks.StockCount}");
             }
+            // TODO: now what?
         }
 
         private void StacksEventDiscardTaken()
         {
-            if (pStacks.DiscardCount > 0)
+            Card drawnCard;
+            string error;
+
+            if (!_gameMaster.RequestDrawDiscard(_gameMaster.CurrentPlayer, out drawnCard, out error))
+            {
+                MessageBox.Show("Denied"); // TODO: what should we actually do here?
+            }
+            else
             {
                 pStacks.DiscardCount--;
-                MessageBox.Show($"New discard count = {pStacks.DiscardCount}");
+                pStacks.VisibleDiscard = _game.GetVisibleDiscard();
             }
+            // TODO: now what?
         }
 
         private void CardPanelCardSelected(Card card, out bool removeCard)
@@ -100,7 +115,9 @@ namespace gin_rummy.Forms
 
         private void randomplayCPUToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // TODO: Implement random play CPU game
+            _gameMaster = new GameMaster(new HumanPlayerGUIBased("Ya boi"), new RandomCPUPlayer("Dave"));
+            _gameMaster.StartGame();
+            return;
             pYourHand.Clear();
             InitialisePlayerCardPanel(pYourHand);
             
@@ -125,10 +142,10 @@ namespace gin_rummy.Forms
         private void GameForm_Shown(object sender, EventArgs e)
         {
             // TODO: remove auto-game start (for testing only)
-            //randomplayCPUToolStripMenuItem_Click(sender, e);
-            _gameMaster = new GameMaster(new RandomCPUPlayer("Teddy"), new RandomCPUPlayer("Dave"));
-            _gameMaster.GameFinished = new EventHandler(TestGameFinished);
-            _gameMaster.StartGame();
+            randomplayCPUToolStripMenuItem_Click(sender, e);
+            //_gameMaster = new GameMaster(new RandomCPUPlayer("Teddy"), new RandomCPUPlayer("Dave"));
+            //_gameMaster.GameFinished = new EventHandler(TestGameFinished);
+            //_gameMaster.StartGame();
         }
 
         private void TestGameFinished(object sender, EventArgs e)

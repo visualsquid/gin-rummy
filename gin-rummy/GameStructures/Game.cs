@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace gin_rummy.GameStructures
 {
+    /// <summary>
+    /// Model class for storing the information assocaited with a game. Generally should only be manipulated by an instance of GameMaster.
+    /// </summary>
     public class Game
     {
         public const int InitialHandSize = 10;
@@ -59,13 +62,11 @@ namespace gin_rummy.GameStructures
 
         public Card DrawDiscard()
         {
-            // TODO: what if discard is empty?
             return _table.DrawDiscard();
         }
 
         public Card DrawStock()
         {
-            // TODO: what if stock is empty?
             return _table.DrawStock();
         }
 
@@ -82,6 +83,11 @@ namespace gin_rummy.GameStructures
         public int GetStockCount()
         {
             return _table.StockCount;
+        }
+
+        public Card GetVisibleDiscard()
+        {
+            return _table.PeekDiscard();
         }
 
     }

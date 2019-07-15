@@ -83,16 +83,28 @@ namespace gin_rummy.Cards
 
         public Card PeekAt(int i)
         {
-            // TODO: bounds checking?
-            return _cards[i];
+            if (i < 0 || i >= _cards.Count)
+            {
+                return null;
+            }
+            else
+            {
+                return _cards[i];
+            }
         }
 
         public Card RemoveAt(int i)
         {
-            // TODO: bounds checking?
-            var card = _cards[i];
-            _cards.Remove(card);
-            return card;
+            if (i < 0 || i >= _cards.Count)
+            {
+                return null;
+            }
+            else
+            {
+                var card = _cards[i];
+                _cards.Remove(card);
+                return card;
+            }
         }
 
         public void Add(Card card)

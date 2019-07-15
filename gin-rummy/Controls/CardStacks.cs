@@ -12,6 +12,10 @@ using gin_rummy.ControlsHelpers;
 
 namespace gin_rummy.Controls
 {
+    /// <summary>
+    /// GUI control for displaying the discard and stock piles. This class is concerned with the visuals only i.e. it does not store a full
+    /// stack of cards, rather it uses the number of cards in each stack plus the top visible card to draw.
+    /// </summary>
     public partial class CardStacks : UserControl
     {
 

@@ -9,6 +9,9 @@ using System.Threading;
 
 namespace gin_rummy.Actors
 {
+    /// <summary>
+    /// Controller class for handling the game. Other actors should make requests of this class in order to progress the game.
+    /// </summary>
     public class GameMaster
     {
 
@@ -35,11 +38,11 @@ namespace gin_rummy.Actors
         private DeadWoodScorer _deadWoodScorer;
         private MeldChecker _meldChecker;
 
-        private Player _currentPlayer;
         private List<PlayerResults> _playerResults;
 
         public List<string> Log { get; }
         public EventHandler GameFinished { get; set; }
+        public Player CurrentPlayer { get; set; }
 
         public GameMaster(Player playerOne, Player playerTwo)
         {
@@ -86,26 +89,26 @@ namespace gin_rummy.Actors
 
         private void HandleTurns()
         {
-            if (_currentPlayer == null || _currentPlayer == _game.PlayerTwo)
+            if (CurrentPlayer == null || CurrentPlayer == _game.PlayerTwo)
             {
-                _currentPlayer = _game.PlayerOne;
+                CurrentPlayer = _game.PlayerOne;
             }
-            else if (_currentPlayer == _game.PlayerOne)
+            else if (CurrentPlayer == _game.PlayerOne)
             {
-                _currentPlayer = _game.PlayerTwo;
+                CurrentPlayer = _game.PlayerTwo;
             }
-            _currentPlayer.YourTurn(this);
+            CurrentPlayer.YourTurn(this);
         }
 
         private void HandleEndGame()
         {
-            _currentPlayer.RequestMelds(this);
+            CurrentPlayer.RequestMelds(this);
         }
 
         private void HandleLayOffs()
         {
-            Player finalPlayer = _currentPlayer == _game.PlayerOne ? _game.PlayerTwo : _game.PlayerOne;
-            PlayerResults currentPlayerResults = _playerResults.First(i => i.Player == _currentPlayer);
+            Player finalPlayer = CurrentPlayer == _game.PlayerOne ? _game.PlayerTwo : _game.PlayerOne;
+            PlayerResults currentPlayerResults = _playerResults.First(i => i.Player == CurrentPlayer);
             finalPlayer.RequestLayOffs(this, currentPlayerResults.Melds);
         }
 
@@ -252,7 +255,7 @@ namespace gin_rummy.Actors
                 error = "Player reference is null.";
                 return false;
             }
-            if (player != _currentPlayer)
+            if (player != CurrentPlayer)
             {
                 error = "It is not your turn.";
                 return false;

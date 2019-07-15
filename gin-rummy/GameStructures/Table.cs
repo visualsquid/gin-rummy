@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace gin_rummy.Cards
 {
+    /// <summary>
+    /// Model class for storing the state of the table, that is, the stacks.
+    /// </summary>
     public class Table
     {
 
@@ -48,6 +51,11 @@ namespace gin_rummy.Cards
             _discards.Shuffle();
             _stock = _discards;
             _discards = new Deck(Deck.DeckType.Empty);
+        }
+
+        public Card PeekDiscard()
+        {
+            return _discards.PeekTop();
         }
     }
 }
