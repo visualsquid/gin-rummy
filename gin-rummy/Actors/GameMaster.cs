@@ -131,26 +131,6 @@ namespace gin_rummy.Actors
             finalPlayer.RequestLayOffs(this, currentPlayerResults.Melds);
         }
 
-        private void LogKnock(string playerName)
-        {
-            Log.Add($"Player {playerName} knocks.");
-        }
-
-        private void LogDrawDiscard(string playerName)
-        {
-            Log.Add($"Player {playerName} draws discard.");
-        }
-
-        private void LogDrawStock(string playerName)
-        {
-            Log.Add($"Player {playerName} draws stock.");
-        }
-
-        private void LogPlaceDiscard(string playerName, string cardName)
-        {
-            Log.Add($"Player {playerName} discards {cardName}.");
-        }
-
         public bool RequestKnock(Player player, out string error)
         {
             if (!ValidateCurrentPlayer(player, out error))
@@ -159,7 +139,7 @@ namespace gin_rummy.Actors
             }
             else
             {
-                LogKnock(player.Name);
+                NotifyGameMessageListeners(new PlayerActionMessage(PlayerActionMessage.PlayerAction.Knock, player));
                 StartEndGame();
                 return true;
             }
@@ -180,7 +160,6 @@ namespace gin_rummy.Actors
             {
                 drawnCard = CurrentGame.DrawDiscard();
                 player.DrawCard(drawnCard);
-                LogDrawDiscard(player.Name);
                 NotifyGameMessageListeners(new PlayerActionMessage(PlayerActionMessage.PlayerAction.DrawDiscard, player, drawnCard));
                 return true;
             }
@@ -201,7 +180,6 @@ namespace gin_rummy.Actors
                 {
                     CurrentGame.RestockFromDiscard();
                 }
-                LogDrawStock(player.Name);
                 NotifyGameMessageListeners(new PlayerActionMessage(PlayerActionMessage.PlayerAction.DrawStock, player, drawnCard));
                 return true;
             }
@@ -221,7 +199,6 @@ namespace gin_rummy.Actors
             else
             {
                 CurrentGame.PlaceDiscard(discard);
-                LogPlaceDiscard(player.Name, discard.ToString());
                 NotifyGameMessageListeners(new PlayerActionMessage(PlayerActionMessage.PlayerAction.SetDiscard, player, discard));
                 StartTurn();
                 return true;
