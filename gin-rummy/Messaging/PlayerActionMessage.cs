@@ -16,7 +16,7 @@ namespace gin_rummy.Messaging
         public enum PlayerAction { DrawDiscard, DrawStock, SetDiscard, Knock }
 
         public PlayerAction PlayerActionValue { get; set; }
-        public Player Player { get; set; }
+        public Player Player { get; set; }// TODO: too much info? Currently mostly all we need is the name...
         public Card Card { get; set; }
 
         public PlayerActionMessage(PlayerAction playerAction, Player player) : this(playerAction, player, null) { }

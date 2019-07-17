@@ -20,6 +20,7 @@ namespace gin_rummy.Forms
     {
         private Game _game;
         private GameMaster _gameMaster;
+        private GameLog _gameLog;
 
         public GameForm()
         {
@@ -115,6 +116,8 @@ namespace gin_rummy.Forms
             _gameMaster = new GameMaster(new HumanPlayerGUIBased("Ya boi"), new RandomCPUPlayer("Dave"));
             _game = _gameMaster.CurrentGame;
             _gameMaster.RegisterGameMessageListener(this);
+            _gameLog = new GameLog(_gameMaster);
+            _gameLog.Show();
             _gameMaster.StartGame();
         }
 

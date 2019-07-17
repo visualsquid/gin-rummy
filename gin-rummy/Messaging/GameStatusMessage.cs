@@ -15,7 +15,7 @@ namespace gin_rummy.Messaging
         public enum GameStatusChange { GameInitialised, StartTurn }
 
         public GameStatusChange GameStatusChangeValue { get; set; }
-        public Player Player { get; set; }
+        public Player Player { get; set; } // TODO: too much info? Currently mostly all we need is the name...
 
         public GameStatusMessage(GameStatusChange gameStatusChange, Player player)
         {
