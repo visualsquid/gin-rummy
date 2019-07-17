@@ -26,6 +26,7 @@ namespace gin_rummy.Controls
         public delegate void OnCardSelected(Card card, out bool removeCard);
 
         public OnCardSelected CardSelected { get; set; }
+        public Card LastHighlightedCard { get; set; }
         public SuitColourScheme ColourScheme
         {
             get
@@ -38,9 +39,9 @@ namespace gin_rummy.Controls
                 _cardDisplayer = new ButtonCardDisplayer(value);
             }
         }
-        public bool ShowCards { get; set; }
-        public bool AllowSelection { get; set; }
-        public bool AllowReordering { get; set; }
+        public bool ShowCards { get; set; } // TODO: when SET, event handlers, etc. need changing
+        public bool AllowSelection { get; set; } // TODO: when SET, event handlers, etc. need changing
+        public bool AllowReordering { get; set; } // TODO: when SET, event handlers, etc. need changing
 
         public CardPanel()
         {
@@ -85,15 +86,7 @@ namespace gin_rummy.Controls
 
         public Card GetSelectedCard()
         {
-            foreach (Control control in pCards.Controls)
-            {
-                if (control is Button && control.Focused)
-                {
-                    return new Card((control as Button).Text);
-                }
-            }
-
-            return null;
+            return LastHighlightedCard; // TODO: what if a button has never been focused yet? what about resetting in between?
         }
 
         private void AddCardToDisplay(Card card, bool showCards)
@@ -121,6 +114,7 @@ namespace gin_rummy.Controls
             if (AllowSelection)
             {
                 button.MouseUp += CardPanelMouseUp;
+                button.GotFocus += CardPanelButtonGotFocus;
             }
 
             if (AllowSelection || AllowReordering)
@@ -189,6 +183,11 @@ namespace gin_rummy.Controls
         {
             ProcessCardSelection(sender);
             e.Handled = true;
+        }
+
+        private void CardPanelButtonGotFocus(object sender, EventArgs e)
+        {
+            LastHighlightedCard = new Card((sender as Button).Text);
         }
 
         private void CardPanelMouseUp(object sender, MouseEventArgs e)

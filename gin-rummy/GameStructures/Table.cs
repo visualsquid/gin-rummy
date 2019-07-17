@@ -38,7 +38,7 @@ namespace gin_rummy.Cards
 
         public Card DrawDiscard()
         {
-            return _discards.RemoveBottom();
+            return _discards.RemoveTop();
         }
 
         public void PlaceDiscard(Card card)
