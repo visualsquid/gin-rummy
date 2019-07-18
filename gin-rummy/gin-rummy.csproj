@@ -55,11 +55,13 @@
     <Compile Include="Actors\Player.cs" />
     <Compile Include="Actors\RandomCPUPlayer.cs" />
     <Compile Include="Cards\Card.cs" />
+    <Compile Include="Cards\CardEqualityComparerSuitAndRank.cs" />
     <Compile Include="Cards\Deck.cs" />
     <Compile Include="Cards\FourColourScheme.cs" />
     <Compile Include="Cards\GinRummyHand.cs" />
     <Compile Include="Cards\GinRummyRankComparer.cs" />
     <Compile Include="Cards\GinRummySuitEqualityComparer.cs" />
+    <Compile Include="Cards\MeldEqualityComparer.cs" />
     <Compile Include="Cards\SuitColourScheme.cs" />
     <Compile Include="Cards\TwoColourScheme.cs" />
     <Compile Include="ControlsHelpers\ButtonCardDisplayer.cs" />

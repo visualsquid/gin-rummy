@@ -131,5 +131,144 @@ namespace test_gin_rummy.Cards
 
             Assert.IsTrue(meldA.DoesOverlap(meldB));
         }
+
+        [TestMethod]
+        public void TestMeldsEqualEmpty()
+        {
+            Meld meldA = new Meld();
+            Meld meldB = new Meld();
+            
+            Assert.IsTrue(meldA.Equals(meldB));
+        }
+
+        [TestMethod]
+        public void TestMeldsEqualOneCard()
+        {
+            Meld meldA = new Meld();
+            Meld meldB = new Meld();
+
+            meldA.AddCard(new Card("Ah"));
+
+            meldB.AddCard(new Card("Ah"));
+
+            Assert.IsTrue(meldA.Equals(meldB));
+        }
+
+        [TestMethod]
+        public void TestMeldsEqualThreeCardsSet()
+        {
+            Meld meldA = new Meld();
+            Meld meldB = new Meld();
+
+            meldA.AddCard(new Card("Ah"));
+            meldA.AddCard(new Card("As"));
+            meldA.AddCard(new Card("Ac"));
+
+            meldB.AddCard(new Card("Ac"));
+            meldB.AddCard(new Card("As"));
+            meldB.AddCard(new Card("Ah"));
+
+            Assert.IsTrue(meldA.Equals(meldB));
+        }
+
+        [TestMethod]
+        public void TestMeldsEqualThreeCardsRun()
+        {
+            Meld meldA = new Meld();
+            Meld meldB = new Meld();
+
+            meldA.AddCard(new Card("Ah"));
+            meldA.AddCard(new Card("2h"));
+            meldA.AddCard(new Card("3h"));
+
+            meldB.AddCard(new Card("2h"));
+            meldB.AddCard(new Card("3h"));
+            meldB.AddCard(new Card("Ah"));
+
+            Assert.IsTrue(meldA.Equals(meldB));
+        }
+
+        [TestMethod]
+        public void TestMeldsNotEqualCardCount()
+        {
+            Meld meldA = new Meld();
+            Meld meldB = new Meld();
+
+            meldA.AddCard(new Card("Ah"));
+
+            meldB.AddCard(new Card("Ah"));
+            meldB.AddCard(new Card("As"));
+
+            Assert.IsFalse(meldA.Equals(meldB));
+        }
+
+        [TestMethod]
+        public void TestMeldsNotEqualRunSuit()
+        {
+            Meld meldA = new Meld();
+            Meld meldB = new Meld();
+
+            meldA.AddCard(new Card("Ah"));
+            meldA.AddCard(new Card("2h"));
+            meldA.AddCard(new Card("3h"));
+
+            meldB.AddCard(new Card("Ac"));
+            meldB.AddCard(new Card("2c"));
+            meldB.AddCard(new Card("3c"));
+
+            Assert.IsFalse(meldA.Equals(meldB));
+        }
+
+        [TestMethod]
+        public void TestMeldsNotEqualRunRanks()
+        {
+            Meld meldA = new Meld();
+            Meld meldB = new Meld();
+
+            meldA.AddCard(new Card("Ah"));
+            meldA.AddCard(new Card("2h"));
+            meldA.AddCard(new Card("3h"));
+
+            meldB.AddCard(new Card("2h"));
+            meldB.AddCard(new Card("3h"));
+            meldB.AddCard(new Card("4h"));
+
+            Assert.IsFalse(meldA.Equals(meldB));
+        }
+
+        [TestMethod]
+        public void TestMeldsNotEqualSetSuit()
+        {
+            Meld meldA = new Meld();
+            Meld meldB = new Meld();
+
+            meldA.AddCard(new Card("Ah"));
+            meldA.AddCard(new Card("Ac"));
+            meldA.AddCard(new Card("Ad"));
+
+            meldB.AddCard(new Card("Ah"));
+            meldB.AddCard(new Card("As"));
+            meldB.AddCard(new Card("Ad"));
+
+            Assert.IsFalse(meldA.Equals(meldB));
+        }
+
+        [TestMethod]
+        public void TestMeldsNotEqualSetRanks()
+        {
+            Meld meldA = new Meld();
+            Meld meldB = new Meld();
+
+            meldA.AddCard(new Card("Ah"));
+            meldA.AddCard(new Card("Ac"));
+            meldA.AddCard(new Card("Ad"));
+
+            meldB.AddCard(new Card("2h"));
+            meldB.AddCard(new Card("2c"));
+            meldB.AddCard(new Card("2d"));
+
+            Assert.IsFalse(meldA.Equals(meldB));
+        }
+
     }
 }

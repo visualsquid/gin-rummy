@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using gin_rummy.Actors;
 using gin_rummy.Cards;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 namespace test_gin_rummy.TestLogic
 {
@@ -174,6 +175,38 @@ namespace test_gin_rummy.TestLogic
             meldSet.Add(meldB);
 
             Assert.AreEqual(3, _checker.GetDeadWood(meldSet, cards).Count);
+        }
+
+        [TestMethod]
+        public void TestGetBestMeldSet()
+        {
+            Hand hand = new Hand();
+            hand.AddCard(new Card("As"));
+            hand.AddCard(new Card("2s"));
+            hand.AddCard(new Card("3s"));
+            hand.AddCard(new Card("3d"));
+            hand.AddCard(new Card("Ks"));
+            hand.AddCard(new Card("3c"));
+            hand.AddCard(new Card("Qs"));
+            hand.AddCard(new Card("Qc"));
+            hand.AddCard(new Card("Qd"));
+
+            var meldSet = new List<Meld>();
+
+            Meld meldA = new Meld();
+            meldA.AddCard(new Card("Qs"));
+            meldA.AddCard(new Card("Qc"));
+            meldA.AddCard(new Card("Qd"));
+            meldSet.Add(meldA);
+
+            Meld meldB = new Meld();
+            meldB.AddCard(new Card("3c"));
+            meldB.AddCard(new Card("3d"));
+            meldB.AddCard(new Card("3s"));
+            meldSet.Add(meldB);
+
+            var bestMeldSet = _checker.GetBestMeldSet(hand);
+            Assert.IsTrue(bestMeldSet.Except(meldSet, new MeldEqualityComparerDefault()).Count() == 0 && meldSet.Except(bestMeldSet, new MeldEqualityComparerDefault()).Count() == 0);
         }
 
     }

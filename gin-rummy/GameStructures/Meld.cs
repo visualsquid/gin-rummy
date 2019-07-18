@@ -46,6 +46,28 @@ namespace gin_rummy.Cards
 
             return theseCards.Intersect(otherCards).Count() > 0;
         }
+
+        public bool IsEqual(Meld other)
+        {
+            return _cards.Except(other._cards, new CardEqualityComparerSuitAndRank()).Count() == 0 && other._cards.Except(_cards, new CardEqualityComparerSuitAndRank()).Count() == 0;
+        }
+
+        public override bool Equals(Object obj)
+        {
+            if (obj is Meld)
+            {
+                return this.IsEqual((obj as Meld));
+            }
+            else
+            {
+                return base.Equals(obj);
+            }
+        }
+
+        public override string ToString()
+        {
+            return String.Join(",", _cards.OrderBy(i => i.RankValue.ToString() + i.SuitValue.ToString()).Select(i => i.ToString()));
+        }
     }
 
 }

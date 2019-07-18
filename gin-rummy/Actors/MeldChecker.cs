@@ -1,10 +1,12 @@
 ﻿using gin_rummy.Cards;
+using gin_rummy.GameStructures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static gin_rummy.Cards.Card;
+
 
 namespace gin_rummy.Actors
 {
@@ -14,10 +16,15 @@ namespace gin_rummy.Actors
     public class MeldChecker
     {
 
+        private DeadWoodScorer _deadWoodScorer;
+
         public const int MinimumRunSize = 3;
         public const int MinimumSetSize = 3;
 
-        public MeldChecker() { }
+        public MeldChecker()
+        {
+            _deadWoodScorer = new DeadWoodScorer();
+        }
 
         public bool IsRun(Meld m)
         {
@@ -174,6 +181,27 @@ namespace gin_rummy.Actors
                 deadWood.RemoveAll(i => meldCards.Contains(i));
             }
             return deadWood;
+        }
+
+        public List<Meld> GetBestMeldSet(Hand hand)
+        {
+            List<Card> cards = hand.ViewHand();
+            List<List<Meld>> allPossibleMeldSets = GetAllPossibleMeldSets(cards);
+
+            List<Meld> bestMeldSet = null;
+            int lowestDeadWoodPenalty = int.MaxValue;
+            foreach(List<Meld> meldSet in allPossibleMeldSets)
+            {
+                List<Card> deadWood = GetDeadWood(meldSet, cards);
+                int nextDeadWoodPenalty = _deadWoodScorer.GetDeadWoodPenalty(deadWood);
+                if (nextDeadWoodPenalty < lowestDeadWoodPenalty)
+                {
+                    lowestDeadWoodPenalty = nextDeadWoodPenalty;
+                    bestMeldSet = meldSet;
+                }
+            }
+
+            return bestMeldSet;
         }
     }
 }
