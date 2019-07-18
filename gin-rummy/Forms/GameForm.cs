@@ -32,17 +32,21 @@ namespace gin_rummy.Forms
             Close();
         }
 
-        private void InitialisePlayerCardPanel(CardPanel p)
+        private SuitColourScheme GetSelectedSuitColourScheme()
         {
             if (Properties.Settings.Default.UseFourColourScheme)
             {
-                p.ColourScheme = new FourColourScheme();
+                return new FourColourScheme();
             }
             else
             {
-                p.ColourScheme = new TwoColourScheme();
+                return new TwoColourScheme();
             }
+        }
 
+        private void InitialisePlayerCardPanel(CardPanel p)
+        {
+            p.ColourScheme = GetSelectedSuitColourScheme();
             p.CardSelected += CardPanelCardSelected;
             p.ShowCards = true;
             p.AllowReordering = true;
@@ -70,6 +74,17 @@ namespace gin_rummy.Forms
             pActions.OnTake += StacksEventDiscardTaken;
             pActions.OnDraw += StacksEventStockDrawn;
             pActions.OnDiscard += StacksEventDiscardPlaced;
+            pActions.OnKnock += PlayerEventKnock;
+        }
+
+        private void PlayerEventKnock()
+        {
+            string error;
+
+            if (!_gameMaster.RequestKnock(_gameMaster.CurrentPlayer, out error))
+            {
+                MessageBox.Show($"Denied: {error}"); // TODO: what should we actually do here?
+            }
         }
 
         private void StacksEventStockDrawn()
@@ -173,7 +188,9 @@ namespace gin_rummy.Forms
                         pActions.AllowDiscard = false;
                         break;
                     case PlayerActionMessage.PlayerAction.Knock:
-                        // TODO: handle Knock message
+                        Form f = new Form();
+                        f.Controls.Add(new MeldCreator(new Hand(actionMessage.Player.GetCards()), GetSelectedSuitColourScheme()));
+                        f.ShowDialog();
                         break;
                     default:
                         break;
@@ -208,11 +225,13 @@ namespace gin_rummy.Forms
                         {
                             pActions.AllowTake = true;
                             pActions.AllowDraw = true;
+                            pActions.AllowKnock = true;
                         }
                         else
                         {
                             pActions.AllowTake = false;
                             pActions.AllowDraw = false;
+                            pActions.AllowKnock = false;
                         }
                         break;
                     default:

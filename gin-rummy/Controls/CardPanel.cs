@@ -42,6 +42,7 @@ namespace gin_rummy.Controls
         public bool ShowCards { get; set; } // TODO: when SET, event handlers, etc. need changing
         public bool AllowSelection { get; set; } // TODO: when SET, event handlers, etc. need changing
         public bool AllowReordering { get; set; } // TODO: when SET, event handlers, etc. need changing
+        public bool AllowDragAway { get; set; } // TODO: when SET, event handlers, etc. need changing
 
         public CardPanel()
         {

@@ -77,6 +77,12 @@
     <Compile Include="Controls\CardStacks.Designer.cs">
       <DependentUpon>CardStacks.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\MeldCreator.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\MeldCreator.Designer.cs">
+      <DependentUpon>MeldCreator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\PlayerActions.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -113,6 +119,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\CardStacks.resx">
       <DependentUpon>CardStacks.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\MeldCreator.resx">
+      <DependentUpon>MeldCreator.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\PlayerActions.resx">
       <DependentUpon>PlayerActions.cs</DependentUpon>

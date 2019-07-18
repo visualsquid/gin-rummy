@@ -17,6 +17,12 @@ namespace gin_rummy.Cards
             _cards = new List<Card>();
         }
 
+        public Hand(List<Card> cards)
+        {
+            _cards = new List<Card>();
+            _cards.AddRange(cards.Select(i => new Card(i.ToString())));
+        }
+
         public List<Card> ViewHand()
         {
             var cards = new List<Card>();
