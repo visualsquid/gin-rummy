@@ -131,11 +131,17 @@ namespace gin_rummy.Forms
             _gameMaster = new GameMaster(new HumanPlayerGUIBased("Ya boi"), new RandomCPUPlayer("Dave"));
             _game = _gameMaster.CurrentGame;
             _gameMaster.RegisterGameMessageListener(this);
-            _gameLog = new GameLog(_gameMaster);
-            _gameLog.Show();
+            InitialiseAndShowLogScreen();
             _gameMaster.StartGame();
         }
 
+        private void InitialiseAndShowLogScreen()
+        {
+            _gameLog = new GameLog(_gameMaster);
+            _gameLog.StartPosition = FormStartPosition.Manual;
+            _gameLog.Location = new Point(this.Right + 1, this.Top);
+            _gameLog.Show();
+        }
 
         private void GameForm_Shown(object sender, EventArgs e)
         {
@@ -189,7 +195,12 @@ namespace gin_rummy.Forms
                         break;
                     case PlayerActionMessage.PlayerAction.Knock:
                         Form f = new Form();
-                        f.Controls.Add(new MeldCreator(new Hand(actionMessage.Player.GetCards()), GetSelectedSuitColourScheme()));
+                        MeldCreator mc = new MeldCreator(new Hand(actionMessage.Player.GetCards()), GetSelectedSuitColourScheme());
+                        f.Width = mc.Width;
+                        f.Height = mc.Height;
+                        mc.Dock = DockStyle.Fill;
+                        mc.OnUserAcceptsSelection = delegate () { f.Hide(); };
+                        f.Controls.Add(mc);
                         f.ShowDialog();
                         break;
                     default:

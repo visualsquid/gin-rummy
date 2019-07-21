@@ -17,16 +17,21 @@ namespace gin_rummy.Controls
     /// </summary>
     public partial class MeldCreator : UserControl
     {
-        private ButtonCardDisplayer _displayer;
+
+        public delegate void UserAcceptsSelectionHandler();
+
         private Hand _hand;
         private Dictionary<Button, CardPanel> _clearButtonMappings;
+
+        public UserAcceptsSelectionHandler OnUserAcceptsSelection { get; set; }
+        public SuitColourScheme SuitColourScheme { get; set; }
 
         public MeldCreator(Hand hand, SuitColourScheme suitColourScheme)
         {
             InitializeComponent();
-            InitialiseClearButtonMappings(_clearButtonMappings);
-            _displayer = new ButtonCardDisplayer(suitColourScheme);
+            InitialiseClearButtonMappings(out _clearButtonMappings);
             _hand = hand;
+            SuitColourScheme = suitColourScheme;
             InitialiseHandPanel(pHand);
             InitialiseMeldPanel(pMeldOne);
             InitialiseMeldPanel(pMeldTwo);
@@ -35,7 +40,23 @@ namespace gin_rummy.Controls
             DisplayHand(_hand);
         }
 
-        private void InitialiseClearButtonMappings(Dictionary<Button, CardPanel> mappings)
+        public List<Meld> GetMelds()
+        {
+            List<Meld> melds = new List<Meld>();
+
+            foreach (CardPanel cardPanel in new CardPanel[] {pMeldOne, pMeldTwo, pMeldThree, pMeldFour}) 
+            {
+                Meld meld = new Meld();
+                foreach(Card card in cardPanel.GetCards())
+                {
+                    meld.AddCard(card);
+                }
+            }
+
+            return melds;
+        }
+
+        private void InitialiseClearButtonMappings(out Dictionary<Button, CardPanel> mappings)
         {
             mappings = new Dictionary<Button, CardPanel>();
             mappings.Add(bClearMeldOne, pMeldOne);
@@ -79,20 +100,23 @@ namespace gin_rummy.Controls
 
         private void InitialiseHandPanel(CardPanel p)
         {
+            p.ColourScheme = SuitColourScheme;
             p.ShowCards = true;
             p.AllowReordering = true;
             p.AllowSelection = false;
-            p.AllowDrop = true;
+            p.AllowDragFrom = true;
+            p.AllowDragTo = true;
         }
 
         private void InitialiseMeldPanel(CardPanel p)
         {
+            p.ColourScheme = SuitColourScheme;
             p.ShowCards = true;
             p.AllowReordering = true;
             p.AllowSelection = true;
             p.CardSelected += MeldPanelCardSelected;
-            p.AllowDrop = true;
-            // TODO: figure out drag and drop between panels
+            p.AllowDragFrom = true;
+            p.AllowDragTo = true;
         }
 
         private void MeldPanelCardSelected(Card card, out bool removeCard)
@@ -103,7 +127,20 @@ namespace gin_rummy.Controls
 
         private void bClearMeldAny_Click(object sender, EventArgs e)
         {
-            _clearButtonMappings[(sender as Button)].Clear();
+            CardPanel panel = _clearButtonMappings[(sender as Button)];
+            foreach(Card card in panel.GetCards())
+            {
+                pHand.AddCard(card);
+            }
+            panel.Clear();
+        }
+
+        private void bAcceptMelds_Click(object sender, EventArgs e)
+        {
+            if (OnUserAcceptsSelection != null)
+            {
+                OnUserAcceptsSelection();
+            }
         }
     }
 }

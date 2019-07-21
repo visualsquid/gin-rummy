@@ -38,6 +38,8 @@
             this.pCards.Name = "pCards";
             this.pCards.Size = new System.Drawing.Size(582, 97);
             this.pCards.TabIndex = 0;
+            this.pCards.DragDrop += new System.Windows.Forms.DragEventHandler(this.pCards_DragDrop);
+            this.pCards.DragOver += new System.Windows.Forms.DragEventHandler(this.pCards_DragOver);
             // 
             // CardPanel
             // 
