@@ -172,7 +172,12 @@ namespace gin_rummy.Controls
             relevantCheckBox.Checked = isMeldValid;
             relevantCheckBox.BackColor = isMeldValid ? Color.Green : Color.Red;
 
-            bAcceptMelds.Enabled = isMeldValid;
+            SetAcceptButtonEnabled();
+        }
+
+        private void SetAcceptButtonEnabled()
+        {
+            bAcceptMelds.Enabled = !_meldValidCheckBoxMappings.Values.Any(i => !i.Checked);
         }
 
         private void bClearMeldAny_Click(object sender, EventArgs e)
