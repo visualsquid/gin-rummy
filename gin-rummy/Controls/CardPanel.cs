@@ -41,8 +41,12 @@ namespace gin_rummy.Controls
         private bool _allowDragTo;
 
         public delegate void OnCardSelected(Card card, out bool removeCard);
+        public delegate void OnCardAdded(CardPanel sender, Card card);
+        public delegate void OnCardRemoved(CardPanel sender, Card card);
 
         public OnCardSelected CardSelected { get; set; }
+        public OnCardAdded CardAdded { get; set; }
+        public OnCardRemoved CardRemoved { get; set; }
         public Card LastHighlightedCard { get; set; }
         public SuitColourScheme ColourScheme
         {
@@ -83,8 +87,13 @@ namespace gin_rummy.Controls
 
         public void Clear()
         {
-            pCards.Controls.Clear();
-            _cards.Clear();
+            List<CardPanelCard> copyOfCardPanelCards = new List<CardPanelCard>();
+            copyOfCardPanelCards.AddRange(_cards);
+
+            foreach(CardPanelCard cardPanelCard in copyOfCardPanelCards)
+            {
+                RemoveCard(cardPanelCard.Card);
+            }
         }
 
         public List<Card> GetCards()
@@ -146,6 +155,11 @@ namespace gin_rummy.Controls
             InsertCardInDisplay(c, i, ShowCards, out button);
 
             _cards.Insert(i, new CardPanelCard(button, c, this));
+
+            if (CardAdded != null)
+            {
+                CardAdded(this, c);
+            }
         }
 
         public void RemoveCard(Card c)
@@ -160,6 +174,11 @@ namespace gin_rummy.Controls
                     pCards.Controls.RemoveAt(i);
                     break;
                 }
+            }
+
+            if (CardRemoved != null)
+            {
+                CardRemoved(this, c);
             }
         }
 

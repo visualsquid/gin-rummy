@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using gin_rummy.ControlsHelpers;
 using gin_rummy.Cards;
+using gin_rummy.Actors;
 
 namespace gin_rummy.Controls
 {
@@ -22,6 +23,8 @@ namespace gin_rummy.Controls
 
         private Hand _hand;
         private Dictionary<Button, CardPanel> _clearButtonMappings;
+        private Dictionary<CardPanel, CheckBox> _meldValidCheckBoxMappings;
+        private MeldChecker _meldChecker;
 
         public UserAcceptsSelectionHandler OnUserAcceptsSelection { get; set; }
         public SuitColourScheme SuitColourScheme { get; set; }
@@ -30,7 +33,9 @@ namespace gin_rummy.Controls
         {
             InitializeComponent();
             InitialiseClearButtonMappings(out _clearButtonMappings);
+            InitialiseMeldValidCheckboxMappings(out _meldValidCheckBoxMappings);
             _hand = hand;
+            _meldChecker = new MeldChecker();
             SuitColourScheme = suitColourScheme;
             InitialiseHandPanel(pHand);
             InitialiseMeldPanel(pMeldOne);
@@ -63,6 +68,15 @@ namespace gin_rummy.Controls
             mappings.Add(bClearMeldTwo, pMeldTwo);
             mappings.Add(bClearMeldThree, pMeldThree);
             mappings.Add(bClearMeldFour, pMeldFour);
+        }
+
+        private void InitialiseMeldValidCheckboxMappings(out Dictionary<CardPanel, CheckBox> mappings)
+        {
+            mappings = new Dictionary<CardPanel, CheckBox>();
+            mappings.Add(pMeldOne, cbMeldOneValid);
+            mappings.Add(pMeldTwo, cbMeldTwoValid);
+            mappings.Add(pMeldThree, cbMeldThreeValid);
+            mappings.Add(pMeldFour, cbMeldFourValid);
         }
 
         private void DisplayHand(Hand hand)
@@ -115,14 +129,45 @@ namespace gin_rummy.Controls
             p.AllowReordering = true;
             p.AllowSelection = true;
             p.CardSelected += MeldPanelCardSelected;
+            p.CardAdded += MeldPanelCardAdded;
+            p.CardRemoved += MeldPanelCardRemoved;
             p.AllowDragFrom = true;
             p.AllowDragTo = true;
+        }
+
+        private void MeldPanelCardAdded(CardPanel sender, Card card)
+        {
+            ValidateMeld(sender);
+        }
+
+        private void MeldPanelCardRemoved(CardPanel sender, Card card)
+        {
+            ValidateMeld(sender);
         }
 
         private void MeldPanelCardSelected(Card card, out bool removeCard)
         {
             removeCard = true;
             AddCardToHandPanel(card, pHand);
+        }
+
+        private void ValidateMeld(CardPanel cardPanel)
+        {
+            Meld meld = new Meld();
+            meld.AddCards(cardPanel.GetCards());
+
+            bool isMeldValid = _meldChecker.IsValid(meld);
+
+            DisplayMeldValidity(cardPanel, isMeldValid);
+        }
+
+        private void DisplayMeldValidity(CardPanel cardPanel, bool isMeldValid)
+        {
+            CheckBox relevantCheckBox = _meldValidCheckBoxMappings[cardPanel];
+            relevantCheckBox.Checked = isMeldValid;
+            relevantCheckBox.BackColor = isMeldValid ? Color.Green : Color.Red;
+
+            bAcceptMelds.Enabled = isMeldValid;
         }
 
         private void bClearMeldAny_Click(object sender, EventArgs e)
