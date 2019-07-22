@@ -28,11 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            gin_rummy.Cards.TwoColourScheme twoColourScheme1 = new gin_rummy.Cards.TwoColourScheme();
-            gin_rummy.Cards.TwoColourScheme twoColourScheme2 = new gin_rummy.Cards.TwoColourScheme();
-            gin_rummy.Cards.TwoColourScheme twoColourScheme3 = new gin_rummy.Cards.TwoColourScheme();
-            gin_rummy.Cards.TwoColourScheme twoColourScheme4 = new gin_rummy.Cards.TwoColourScheme();
-            gin_rummy.Cards.TwoColourScheme twoColourScheme5 = new gin_rummy.Cards.TwoColourScheme();
+            gin_rummy.Cards.TwoColourScheme twoColourScheme6 = new gin_rummy.Cards.TwoColourScheme();
+            gin_rummy.Cards.TwoColourScheme twoColourScheme7 = new gin_rummy.Cards.TwoColourScheme();
+            gin_rummy.Cards.TwoColourScheme twoColourScheme8 = new gin_rummy.Cards.TwoColourScheme();
+            gin_rummy.Cards.TwoColourScheme twoColourScheme9 = new gin_rummy.Cards.TwoColourScheme();
+            gin_rummy.Cards.TwoColourScheme twoColourScheme10 = new gin_rummy.Cards.TwoColourScheme();
             this.pTableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.bClearMeldFour = new System.Windows.Forms.Button();
             this.bClearMeldThree = new System.Windows.Forms.Button();
@@ -40,6 +40,10 @@
             this.bAcceptMelds = new System.Windows.Forms.Button();
             this.bClearMeldOne = new System.Windows.Forms.Button();
             this.bClearMeldTwo = new System.Windows.Forms.Button();
+            this.cbMeldOneValid = new System.Windows.Forms.CheckBox();
+            this.cbMeldTwoValid = new System.Windows.Forms.CheckBox();
+            this.cbMeldThreeValid = new System.Windows.Forms.CheckBox();
+            this.cbMeldFourValid = new System.Windows.Forms.CheckBox();
             this.pMeldFour = new gin_rummy.Controls.CardPanel();
             this.pMeldThree = new gin_rummy.Controls.CardPanel();
             this.pMeldTwo = new gin_rummy.Controls.CardPanel();
@@ -51,9 +55,10 @@
             // 
             // pTableLayout
             // 
-            this.pTableLayout.ColumnCount = 2;
+            this.pTableLayout.ColumnCount = 3;
             this.pTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 83.33334F));
             this.pTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
+            this.pTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 56F));
             this.pTableLayout.Controls.Add(this.bClearMeldFour, 1, 4);
             this.pTableLayout.Controls.Add(this.bClearMeldThree, 1, 3);
             this.pTableLayout.Controls.Add(this.pMeldFour, 0, 4);
@@ -64,6 +69,10 @@
             this.pTableLayout.Controls.Add(this.pButtons, 0, 5);
             this.pTableLayout.Controls.Add(this.bClearMeldOne, 1, 1);
             this.pTableLayout.Controls.Add(this.bClearMeldTwo, 1, 2);
+            this.pTableLayout.Controls.Add(this.cbMeldOneValid, 2, 1);
+            this.pTableLayout.Controls.Add(this.cbMeldTwoValid, 2, 2);
+            this.pTableLayout.Controls.Add(this.cbMeldThreeValid, 2, 3);
+            this.pTableLayout.Controls.Add(this.cbMeldFourValid, 2, 4);
             this.pTableLayout.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pTableLayout.Location = new System.Drawing.Point(0, 0);
             this.pTableLayout.Name = "pTableLayout";
@@ -80,9 +89,9 @@
             // bClearMeldFour
             // 
             this.bClearMeldFour.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bClearMeldFour.Location = new System.Drawing.Point(712, 307);
+            this.bClearMeldFour.Location = new System.Drawing.Point(665, 307);
             this.bClearMeldFour.Name = "bClearMeldFour";
-            this.bClearMeldFour.Size = new System.Drawing.Size(136, 70);
+            this.bClearMeldFour.Size = new System.Drawing.Size(126, 70);
             this.bClearMeldFour.TabIndex = 14;
             this.bClearMeldFour.Text = "Clear";
             this.bClearMeldFour.UseVisualStyleBackColor = true;
@@ -91,9 +100,9 @@
             // bClearMeldThree
             // 
             this.bClearMeldThree.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bClearMeldThree.Location = new System.Drawing.Point(712, 231);
+            this.bClearMeldThree.Location = new System.Drawing.Point(665, 231);
             this.bClearMeldThree.Name = "bClearMeldThree";
-            this.bClearMeldThree.Size = new System.Drawing.Size(136, 70);
+            this.bClearMeldThree.Size = new System.Drawing.Size(126, 70);
             this.bClearMeldThree.TabIndex = 13;
             this.bClearMeldThree.Text = "Clear";
             this.bClearMeldThree.UseVisualStyleBackColor = true;
@@ -106,13 +115,13 @@
             this.pButtons.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pButtons.Location = new System.Drawing.Point(3, 383);
             this.pButtons.Name = "pButtons";
-            this.pButtons.Size = new System.Drawing.Size(845, 41);
+            this.pButtons.Size = new System.Drawing.Size(788, 41);
             this.pButtons.TabIndex = 2;
             // 
             // bAcceptMelds
             // 
             this.bAcceptMelds.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bAcceptMelds.Location = new System.Drawing.Point(767, 14);
+            this.bAcceptMelds.Location = new System.Drawing.Point(710, 14);
             this.bAcceptMelds.Name = "bAcceptMelds";
             this.bAcceptMelds.Size = new System.Drawing.Size(75, 23);
             this.bAcceptMelds.TabIndex = 0;
@@ -123,9 +132,9 @@
             // bClearMeldOne
             // 
             this.bClearMeldOne.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bClearMeldOne.Location = new System.Drawing.Point(712, 79);
+            this.bClearMeldOne.Location = new System.Drawing.Point(665, 79);
             this.bClearMeldOne.Name = "bClearMeldOne";
-            this.bClearMeldOne.Size = new System.Drawing.Size(136, 70);
+            this.bClearMeldOne.Size = new System.Drawing.Size(126, 70);
             this.bClearMeldOne.TabIndex = 11;
             this.bClearMeldOne.Text = "Clear";
             this.bClearMeldOne.UseVisualStyleBackColor = true;
@@ -134,13 +143,64 @@
             // bClearMeldTwo
             // 
             this.bClearMeldTwo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bClearMeldTwo.Location = new System.Drawing.Point(712, 155);
+            this.bClearMeldTwo.Location = new System.Drawing.Point(665, 155);
             this.bClearMeldTwo.Name = "bClearMeldTwo";
-            this.bClearMeldTwo.Size = new System.Drawing.Size(136, 70);
+            this.bClearMeldTwo.Size = new System.Drawing.Size(126, 70);
             this.bClearMeldTwo.TabIndex = 12;
             this.bClearMeldTwo.Text = "Clear";
             this.bClearMeldTwo.UseVisualStyleBackColor = true;
             this.bClearMeldTwo.Click += new System.EventHandler(this.bClearMeldAny_Click);
+            // 
+            // cbMeldOneValid
+            // 
+            this.cbMeldOneValid.AutoSize = true;
+            this.cbMeldOneValid.BackColor = System.Drawing.Color.Red;
+            this.cbMeldOneValid.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.cbMeldOneValid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cbMeldOneValid.Location = new System.Drawing.Point(797, 79);
+            this.cbMeldOneValid.Name = "cbMeldOneValid";
+            this.cbMeldOneValid.Size = new System.Drawing.Size(51, 70);
+            this.cbMeldOneValid.TabIndex = 15;
+            this.cbMeldOneValid.UseVisualStyleBackColor = false;
+            // 
+            // cbMeldTwoValid
+            // 
+            this.cbMeldTwoValid.AutoSize = true;
+            this.cbMeldTwoValid.BackColor = System.Drawing.Color.Red;
+            this.cbMeldTwoValid.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.cbMeldTwoValid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cbMeldTwoValid.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.cbMeldTwoValid.Location = new System.Drawing.Point(797, 155);
+            this.cbMeldTwoValid.Name = "cbMeldTwoValid";
+            this.cbMeldTwoValid.Size = new System.Drawing.Size(51, 70);
+            this.cbMeldTwoValid.TabIndex = 16;
+            this.cbMeldTwoValid.UseVisualStyleBackColor = false;
+            // 
+            // cbMeldThreeValid
+            // 
+            this.cbMeldThreeValid.AutoSize = true;
+            this.cbMeldThreeValid.BackColor = System.Drawing.Color.Red;
+            this.cbMeldThreeValid.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.cbMeldThreeValid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cbMeldThreeValid.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.cbMeldThreeValid.Location = new System.Drawing.Point(797, 231);
+            this.cbMeldThreeValid.Name = "cbMeldThreeValid";
+            this.cbMeldThreeValid.Size = new System.Drawing.Size(51, 70);
+            this.cbMeldThreeValid.TabIndex = 17;
+            this.cbMeldThreeValid.UseVisualStyleBackColor = false;
+            // 
+            // cbMeldFourValid
+            // 
+            this.cbMeldFourValid.AutoSize = true;
+            this.cbMeldFourValid.BackColor = System.Drawing.Color.Red;
+            this.cbMeldFourValid.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.cbMeldFourValid.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.cbMeldFourValid.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.cbMeldFourValid.Location = new System.Drawing.Point(797, 307);
+            this.cbMeldFourValid.Name = "cbMeldFourValid";
+            this.cbMeldFourValid.Size = new System.Drawing.Size(51, 70);
+            this.cbMeldFourValid.TabIndex = 18;
+            this.cbMeldFourValid.UseVisualStyleBackColor = false;
             // 
             // pMeldFour
             // 
@@ -148,14 +208,16 @@
             this.pMeldFour.AllowDragTo = false;
             this.pMeldFour.AllowReordering = false;
             this.pMeldFour.AllowSelection = false;
+            this.pMeldFour.CardAdded = null;
+            this.pMeldFour.CardRemoved = null;
             this.pMeldFour.CardSelected = null;
-            this.pMeldFour.ColourScheme = twoColourScheme1;
+            this.pMeldFour.ColourScheme = twoColourScheme6;
             this.pMeldFour.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pMeldFour.LastHighlightedCard = null;
             this.pMeldFour.Location = new System.Drawing.Point(3, 307);
             this.pMeldFour.Name = "pMeldFour";
             this.pMeldFour.ShowCards = false;
-            this.pMeldFour.Size = new System.Drawing.Size(703, 70);
+            this.pMeldFour.Size = new System.Drawing.Size(656, 70);
             this.pMeldFour.TabIndex = 10;
             // 
             // pMeldThree
@@ -164,14 +226,16 @@
             this.pMeldThree.AllowDragTo = false;
             this.pMeldThree.AllowReordering = false;
             this.pMeldThree.AllowSelection = false;
+            this.pMeldThree.CardAdded = null;
+            this.pMeldThree.CardRemoved = null;
             this.pMeldThree.CardSelected = null;
-            this.pMeldThree.ColourScheme = twoColourScheme2;
+            this.pMeldThree.ColourScheme = twoColourScheme7;
             this.pMeldThree.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pMeldThree.LastHighlightedCard = null;
             this.pMeldThree.Location = new System.Drawing.Point(3, 231);
             this.pMeldThree.Name = "pMeldThree";
             this.pMeldThree.ShowCards = false;
-            this.pMeldThree.Size = new System.Drawing.Size(703, 70);
+            this.pMeldThree.Size = new System.Drawing.Size(656, 70);
             this.pMeldThree.TabIndex = 9;
             // 
             // pMeldTwo
@@ -180,14 +244,16 @@
             this.pMeldTwo.AllowDragTo = false;
             this.pMeldTwo.AllowReordering = false;
             this.pMeldTwo.AllowSelection = false;
+            this.pMeldTwo.CardAdded = null;
+            this.pMeldTwo.CardRemoved = null;
             this.pMeldTwo.CardSelected = null;
-            this.pMeldTwo.ColourScheme = twoColourScheme3;
+            this.pMeldTwo.ColourScheme = twoColourScheme8;
             this.pMeldTwo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pMeldTwo.LastHighlightedCard = null;
             this.pMeldTwo.Location = new System.Drawing.Point(3, 155);
             this.pMeldTwo.Name = "pMeldTwo";
             this.pMeldTwo.ShowCards = false;
-            this.pMeldTwo.Size = new System.Drawing.Size(703, 70);
+            this.pMeldTwo.Size = new System.Drawing.Size(656, 70);
             this.pMeldTwo.TabIndex = 8;
             // 
             // pMeldOne
@@ -196,14 +262,16 @@
             this.pMeldOne.AllowDragTo = false;
             this.pMeldOne.AllowReordering = false;
             this.pMeldOne.AllowSelection = false;
+            this.pMeldOne.CardAdded = null;
+            this.pMeldOne.CardRemoved = null;
             this.pMeldOne.CardSelected = null;
-            this.pMeldOne.ColourScheme = twoColourScheme4;
+            this.pMeldOne.ColourScheme = twoColourScheme9;
             this.pMeldOne.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pMeldOne.LastHighlightedCard = null;
             this.pMeldOne.Location = new System.Drawing.Point(3, 79);
             this.pMeldOne.Name = "pMeldOne";
             this.pMeldOne.ShowCards = false;
-            this.pMeldOne.Size = new System.Drawing.Size(703, 70);
+            this.pMeldOne.Size = new System.Drawing.Size(656, 70);
             this.pMeldOne.TabIndex = 7;
             // 
             // pHand
@@ -213,15 +281,17 @@
             this.pHand.AllowReordering = false;
             this.pHand.AllowSelection = false;
             this.pHand.AutoScroll = true;
+            this.pHand.CardAdded = null;
+            this.pHand.CardRemoved = null;
             this.pHand.CardSelected = null;
-            this.pHand.ColourScheme = twoColourScheme5;
+            this.pHand.ColourScheme = twoColourScheme10;
             this.pTableLayout.SetColumnSpan(this.pHand, 2);
             this.pHand.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pHand.LastHighlightedCard = null;
             this.pHand.Location = new System.Drawing.Point(3, 3);
             this.pHand.Name = "pHand";
             this.pHand.ShowCards = false;
-            this.pHand.Size = new System.Drawing.Size(845, 70);
+            this.pHand.Size = new System.Drawing.Size(788, 70);
             this.pHand.TabIndex = 3;
             // 
             // MeldCreator
@@ -232,6 +302,7 @@
             this.Name = "MeldCreator";
             this.Size = new System.Drawing.Size(851, 427);
             this.pTableLayout.ResumeLayout(false);
+            this.pTableLayout.PerformLayout();
             this.pButtons.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -250,5 +321,9 @@
         private System.Windows.Forms.Button bClearMeldThree;
         private System.Windows.Forms.Button bClearMeldOne;
         private System.Windows.Forms.Button bClearMeldTwo;
+        private System.Windows.Forms.CheckBox cbMeldOneValid;
+        private System.Windows.Forms.CheckBox cbMeldTwoValid;
+        private System.Windows.Forms.CheckBox cbMeldThreeValid;
+        private System.Windows.Forms.CheckBox cbMeldFourValid;
     }
 }

@@ -24,6 +24,11 @@ namespace gin_rummy.Cards
             _cards.Add(c);
         }
 
+        public void AddCards(List<Card> cards)
+        {
+            _cards.AddRange(cards);
+        }
+
         public bool RemoveCard(Card c)
         {
             return _cards.Remove(c);
