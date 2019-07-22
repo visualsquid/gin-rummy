@@ -140,7 +140,7 @@ namespace gin_rummy.Actors
             else
             {
                 NotifyGameMessageListeners(new PlayerActionMessage(PlayerActionMessage.PlayerAction.Knock, player));
-                StartEndGame();
+                NotifyGameMessageListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartMeld, player));
                 return true;
             }
         }

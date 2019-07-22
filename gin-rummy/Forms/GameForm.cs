@@ -194,14 +194,7 @@ namespace gin_rummy.Forms
                         pActions.AllowDiscard = false;
                         break;
                     case PlayerActionMessage.PlayerAction.Knock:
-                        Form f = new Form();
-                        MeldCreator mc = new MeldCreator(new Hand(actionMessage.Player.GetCards()), GetSelectedSuitColourScheme());
-                        f.Width = mc.Width;
-                        f.Height = mc.Height;
-                        mc.Dock = DockStyle.Fill;
-                        mc.OnUserAcceptsSelection = delegate () { f.Hide(); };
-                        f.Controls.Add(mc);
-                        f.ShowDialog();
+                        // Nothing required
                         break;
                     default:
                         break;
@@ -210,13 +203,13 @@ namespace gin_rummy.Forms
             else if (message is GameStatusMessage)
             {
                 GameStatusMessage statusMessage = (GameStatusMessage)message;
+                Player humanPlayer = _game.PlayerOne; // TODO: assumes PlayerOne is always the human player
                 switch (statusMessage.GameStatusChangeValue)
                 {
                     case GameStatusMessage.GameStatusChange.GameInitialised:
-                        // TODO: assumes PlayerOne is always the human player
                         pYourHand.Clear();
                         InitialisePlayerCardPanel(pYourHand);
-                        foreach (Card c in _game.PlayerOne.GetCards())
+                        foreach (Card c in humanPlayer.GetCards())
                         {
                             pYourHand.AddCard(c);
                         }
@@ -232,7 +225,7 @@ namespace gin_rummy.Forms
                         InitialisePlayerActions();
                         break;
                     case GameStatusMessage.GameStatusChange.StartTurn:
-                        if (statusMessage.Player == _game.PlayerOne)
+                        if (statusMessage.Player == humanPlayer)
                         {
                             pActions.AllowTake = true;
                             pActions.AllowDraw = true;
@@ -245,10 +238,32 @@ namespace gin_rummy.Forms
                             pActions.AllowKnock = false;
                         }
                         break;
+                    case GameStatusMessage.GameStatusChange.StartMeld:
+                        var meldCreator = ShowMeldCreator(humanPlayer);
+                        string error;
+                        Meld invalidMeld;
+                        // TODO: what if this fails? Stick it in a loop?
+                        _gameMaster.RequestSetMelds(_game.PlayerTwo, meldCreator.GetMelds(), meldCreator.GetUnmeldedCards(), out error, out invalidMeld);
+                        break;
                     default:
                         break;
                 }
             }
         }
+
+        private MeldCreator ShowMeldCreator(Player player)
+        {
+            Form f = new Form();
+            MeldCreator mc = new MeldCreator(new Hand(player.GetCards()), GetSelectedSuitColourScheme());
+            f.Width = mc.Width;
+            f.Height = mc.Height;
+            mc.Dock = DockStyle.Fill;
+            mc.OnUserAcceptsSelection = delegate () { f.Hide(); };
+            f.Controls.Add(mc);
+            f.ShowDialog();
+
+            return mc;
+        }
+
     }
 }

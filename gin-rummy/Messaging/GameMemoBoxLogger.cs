@@ -49,6 +49,8 @@ namespace gin_rummy.Messaging
                     return "New game was initialised.";
                 case GameStatusMessage.GameStatusChange.StartTurn:
                     return $"{message.Player.Name}'s turn.";
+                case GameStatusMessage.GameStatusChange.StartMeld:
+                    return $"{message.Player.Name}: meld your cards!";
                 default:
                     return "Unknown message";
             }

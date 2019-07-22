@@ -56,6 +56,11 @@ namespace gin_rummy.Controls
             return melds;
         }
 
+        public List<Card> GetUnmeldedCards()
+        {
+            return pHand.GetCards();
+        }
+
         private void InitialiseClearButtonMappings(out Dictionary<Button, CardPanel> mappings)
         {
             mappings = new Dictionary<Button, CardPanel>();
