@@ -237,7 +237,7 @@ namespace gin_rummy.Actors
             var relevantResults = _playerResults.First(i => i.Player == player);
             relevantResults.Melds = melds;
             relevantResults.DeadWood = deadWood;
-            // TODO: add log
+            
             StartLayOffs();
             return true;
         }

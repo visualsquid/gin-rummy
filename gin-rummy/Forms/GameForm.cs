@@ -264,6 +264,5 @@ namespace gin_rummy.Forms
 
             return mc;
         }
-
     }
 }
