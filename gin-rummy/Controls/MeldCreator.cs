@@ -19,12 +19,21 @@ namespace gin_rummy.Controls
     public partial class MeldCreator : UserControl
     {
 
+        private class MeldValidityDisplay
+        {
+            public Color CheckboxColour { get; set; }
+            public CheckState CheckboxState { get; set; }
+        }
+
         public delegate void UserAcceptsSelectionHandler();
 
         private Hand _hand;
         private Dictionary<Button, CardPanel> _clearButtonMappings;
         private Dictionary<CardPanel, CheckBox> _meldValidCheckBoxMappings;
         private MeldChecker _meldChecker;
+        private MeldValidityDisplay _meldDisplayValid;
+        private MeldValidityDisplay _meldDisplayInvalid;
+        private MeldValidityDisplay _meldDisplayEmpty;
 
         public UserAcceptsSelectionHandler OnUserAcceptsSelection { get; set; }
         public SuitColourScheme SuitColourScheme { get; set; }
@@ -37,12 +46,20 @@ namespace gin_rummy.Controls
             _hand = hand;
             _meldChecker = new MeldChecker();
             SuitColourScheme = suitColourScheme;
+            InitialiseMeldValidityDisplays();
             InitialiseHandPanel(pHand);
             InitialiseMeldPanel(pMeldOne);
             InitialiseMeldPanel(pMeldTwo);
             InitialiseMeldPanel(pMeldThree);
             InitialiseMeldPanel(pMeldFour);
             DisplayHand(_hand);
+        }
+
+        private void InitialiseMeldValidityDisplays()
+        {
+            _meldDisplayValid= new MeldValidityDisplay() { CheckboxColour = Color.Green, CheckboxState = CheckState.Checked };
+            _meldDisplayInvalid= new MeldValidityDisplay() { CheckboxColour = Color.Red, CheckboxState = CheckState.Unchecked };
+            _meldDisplayEmpty= new MeldValidityDisplay() { CheckboxColour = Color.SlateGray, CheckboxState = CheckState.Indeterminate };
         }
 
         public List<Meld> GetMelds()
@@ -133,6 +150,7 @@ namespace gin_rummy.Controls
             p.CardRemoved += MeldPanelCardRemoved;
             p.AllowDragFrom = true;
             p.AllowDragTo = true;
+            DisplayMeldValidity(p, false, true);
         }
 
         private void MeldPanelCardAdded(CardPanel sender, Card card)
@@ -157,17 +175,27 @@ namespace gin_rummy.Controls
             meld.AddCards(cardPanel.GetCards());
 
             bool isMeldValid = _meldChecker.IsValid(meld);
+            bool isMeldEmpty = meld.GetListOfCardsInMeld().Count == 0;
 
-            DisplayMeldValidity(cardPanel, isMeldValid);
+            DisplayMeldValidity(cardPanel, isMeldValid, isMeldEmpty);
         }
 
-        private void DisplayMeldValidity(CardPanel cardPanel, bool isMeldValid)
+        private void DisplayMeldValidity(CardPanel cardPanel, bool isMeldValid, bool isMeldEmpty)
         {
-            CheckBox relevantCheckBox = _meldValidCheckBoxMappings[cardPanel];
-            relevantCheckBox.Checked = isMeldValid;
-            relevantCheckBox.BackColor = isMeldValid ? Color.Green : Color.Red;
+            MeldValidityDisplay display;
 
-            bAcceptMelds.Enabled = isMeldValid;
+            if (isMeldEmpty)
+            {
+                display = _meldDisplayEmpty;
+            }
+            else 
+            {
+                display = isMeldValid ? _meldDisplayValid : _meldDisplayInvalid;
+            }
+
+            var relevantCheckBox = _meldValidCheckBoxMappings[cardPanel];
+            relevantCheckBox.BackColor = display.CheckboxColour;
+            relevantCheckBox.CheckState = display.CheckboxState;
         }
 
         private void bClearMeldAny_Click(object sender, EventArgs e)
