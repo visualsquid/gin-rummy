@@ -18,6 +18,8 @@ namespace gin_rummy.Forms
 {
     public partial class GameForm : Form, IGameStatusListener, IPlayerResponseListener
     {
+        private readonly Queue<GameMessage> _pendingMessages;
+        private BackgroundWorker _worker;
         private Game _game;
         private GameMaster _gameMaster;
         private GameLog _gameLog;
@@ -26,6 +28,8 @@ namespace gin_rummy.Forms
         public GameForm()
         {
             InitializeComponent();
+            _pendingMessages = new Queue<GameMessage>();
+            _worker = null;
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -145,6 +149,100 @@ namespace gin_rummy.Forms
 
         public void ReceiveMessage(GameStatusMessage message)
         {
+            lock (_pendingMessages)
+            {
+                _pendingMessages.Enqueue(message);
+            }
+
+            if (_worker == null) // TODO: is this causing a race condition (in all Actor classes)?
+            {
+                SpawnBackgroundWorkerToHandleMessage();
+            }
+        }
+
+        public void ReceiveMessage(PlayerResponseMessage response)
+        {
+            lock (_pendingMessages)
+            {
+                _pendingMessages.Enqueue(response);
+            }
+
+            if (_worker == null)
+            {
+                SpawnBackgroundWorkerToHandleMessage();
+            }
+        }
+
+        private MeldCreator ShowMeldCreator(Player player)
+        {
+            Form f = new Form();
+            MeldCreator mc = new MeldCreator(new Hand(player.GetCards()), GetSelectedSuitColourScheme());
+            f.Width = mc.Width;
+            f.Height = mc.Height;
+            mc.Dock = DockStyle.Fill;
+            mc.OnUserAcceptsSelection = delegate () { f.Hide(); };
+            f.Controls.Add(mc);
+            f.ShowDialog();
+
+            return mc;
+        }
+
+        private MeldCreator ShowLayoffControl(MeldedHand yourHand, MeldedHand opponentsHand)
+        {
+            Form f = new Form();
+            MeldCreator mc = new MeldCreator(new MeldedHand(opponentsHand.Melds, yourHand.Deadwood), GetSelectedSuitColourScheme());
+            f.Width = mc.Width;
+            f.Height = mc.Height;
+            mc.Dock = DockStyle.Fill;
+            mc.OnUserAcceptsSelection = delegate () { f.Hide(); };
+            f.Controls.Add(mc);
+            f.ShowDialog();
+
+            return mc;
+        }
+
+        private void SpawnBackgroundWorkerToHandleMessage()
+        {
+            _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
+            _worker.DoWork += BackgroundWorker_DoWork;
+            _worker.RunWorkerCompleted += BackgroundWorker_WorkCompleted;
+            _worker.RunWorkerAsync();
+        }
+
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            const int MaxBufferSize = 50;
+            var buffer = new Queue<GameMessage>();
+
+            lock (_pendingMessages)
+            {
+                for (int i = MaxBufferSize; i > 0 && _pendingMessages.Count > 0; i--)
+                {
+                    buffer.Enqueue(_pendingMessages.Dequeue());
+                }
+            }
+
+            while (buffer.Count > 0)
+            {
+                GameMessage nextMessage = buffer.Dequeue();
+
+                if (nextMessage is GameStatusMessage)
+                {
+                    this.Invoke((MethodInvoker)delegate { HandleMessage(nextMessage as GameStatusMessage); });
+                }
+                else if (nextMessage is PlayerResponseMessage)
+                {
+                    this.Invoke((MethodInvoker)delegate { HandleMessage(nextMessage as PlayerResponseMessage); }); 
+                }
+                else
+                {
+                    throw new Exception("Unexpected error - unknown message type.");
+                }
+            }
+        }
+
+        private void HandleMessage(GameStatusMessage message)
+        {
             string error;
             Meld invalidMeld;
 
@@ -204,7 +302,7 @@ namespace gin_rummy.Forms
             }
         }
 
-        public void ReceiveMessage(PlayerResponseMessage response)
+        private void HandleMessage(PlayerResponseMessage response)
         {
             if (response.Response == PlayerResponseMessage.PlayerResponseType.Denied)
             {
@@ -246,32 +344,9 @@ namespace gin_rummy.Forms
             }
         }
 
-        private MeldCreator ShowMeldCreator(Player player)
+        private void BackgroundWorker_WorkCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            Form f = new Form();
-            MeldCreator mc = new MeldCreator(new Hand(player.GetCards()), GetSelectedSuitColourScheme());
-            f.Width = mc.Width;
-            f.Height = mc.Height;
-            mc.Dock = DockStyle.Fill;
-            mc.OnUserAcceptsSelection = delegate () { f.Hide(); };
-            f.Controls.Add(mc);
-            f.ShowDialog();
-
-            return mc;
-        }
-
-        private MeldCreator ShowLayoffControl(MeldedHand yourHand, MeldedHand opponentsHand)
-        {
-            Form f = new Form();
-            MeldCreator mc = new MeldCreator(new MeldedHand(opponentsHand.Melds, yourHand.Deadwood), GetSelectedSuitColourScheme());
-            f.Width = mc.Width;
-            f.Height = mc.Height;
-            mc.Dock = DockStyle.Fill;
-            mc.OnUserAcceptsSelection = delegate () { f.Hide(); };
-            f.Controls.Add(mc);
-            f.ShowDialog();
-
-            return mc;
+            _worker = null;
         }
     }
 }

@@ -6,30 +6,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace gin_rummy.Actors
 {
     public class RandomCPUPlayer : Player
     {
-
         private enum TicketType { Knock, DrawDiscard, DrawStock }
 
         private const int KnockTicketCount = 5;
         private const double DrawDiscardTicketCount = 45;
         private const double DrawStockTicketCount = 50;
 
-        private Random _random;
-        private List<TicketType> _tickets;
+        private readonly Queue<GameMessage> _pendingMessages;
+        private readonly Random _random;
+        private readonly List<TicketType> _tickets;
+        private BackgroundWorker _worker;
 
         public RandomCPUPlayer(string name) : base (name)
         {
+            _pendingMessages = new Queue<GameMessage>();
             _random = new Random();
-            InitiateTickets();
+            _tickets = new List<TicketType>();
+            _worker = null;
+            InitialiseTickets();
         }
 
-        private void InitiateTickets()
+        private void InitialiseTickets()
         {
-            _tickets = new List<TicketType>();
             AddKnockTickets();
             AddDrawDiscardTickets();
             AddDrawStockTickets();
@@ -119,7 +123,51 @@ namespace gin_rummy.Actors
             throw new NotImplementedException();
         }
 
-        public override void ReceiveMessage(GameStatusMessage message)
+        private void SpawnBackgroundWorkerToHandleMessage()
+        {
+            _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
+            _worker.DoWork += BackgroundWorker_DoWork;
+            _worker.RunWorkerCompleted += BackgroundWorker_WorkCompleted;
+            _worker.RunWorkerAsync();
+        }
+
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            const int MaxBufferSize = 50;
+            var buffer = new Queue<GameMessage>();
+
+            lock (_pendingMessages)
+            {
+                for (int i = MaxBufferSize; i > 0 && _pendingMessages.Count > 0; i--)
+                {
+                    buffer.Enqueue(_pendingMessages.Dequeue());
+                }
+            }
+
+            while (buffer.Count > 0)
+            {
+                GameMessage nextMessage = buffer.Dequeue();
+                if (nextMessage is GameStatusMessage)
+                {
+                    HandleMessage(nextMessage as GameStatusMessage);
+                }
+                else if (nextMessage is PlayerResponseMessage)
+                {
+                    HandleMessage(nextMessage as PlayerResponseMessage);
+                }
+                else
+                {
+                    throw new Exception("Unexpected error - unknown message type.");
+                }
+            }
+        }
+
+        private void BackgroundWorker_WorkCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            _worker = null;
+        }
+
+        private void HandleMessage(GameStatusMessage message)
         {
             switch (message.GameStatusChangeValue)
             {
@@ -149,7 +197,7 @@ namespace gin_rummy.Actors
             }
         }
 
-        public override void ReceiveMessage(PlayerResponseMessage message)
+        private void HandleMessage(PlayerResponseMessage message)
         {
             if (message.Player != this)
             {
@@ -181,6 +229,32 @@ namespace gin_rummy.Actors
                     break;
                 default:
                     break;
+            }
+        }
+
+        public override void ReceiveMessage(GameStatusMessage message)
+        {
+            lock (_pendingMessages)
+            {
+                _pendingMessages.Enqueue(message);
+            }
+
+            if (_worker == null)
+            {
+                SpawnBackgroundWorkerToHandleMessage();
+            }
+        }
+
+        public override void ReceiveMessage(PlayerResponseMessage message)
+        {
+            lock (_pendingMessages)
+            {
+                _pendingMessages.Enqueue(message);
+            }
+
+            if (_worker == null)
+            {
+                SpawnBackgroundWorkerToHandleMessage();
             }
         }
     }

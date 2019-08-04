@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
 using gin_rummy.Messaging;
+using System.ComponentModel;
 
 namespace gin_rummy.Actors
 {
@@ -35,6 +36,8 @@ namespace gin_rummy.Actors
         private Thread _endGameHandler;
         private Thread _layOffsHandler;
 
+        private readonly Queue<GameMessage> _pendingMessages;
+        private BackgroundWorker _worker;
         private HashSet<IGameStatusListener> _statusListeners;
         private HashSet<IPlayerResponseListener> _responseListeners;
         private DeadWoodScorer _deadWoodScorer;
@@ -43,13 +46,15 @@ namespace gin_rummy.Actors
         private List<PlayerResults> _playerResults;
         private Hand _playerOneStartingHand; // TODO: remove/refactor debug functionality
 
-        public List<string> Log { get; }
+        public List<string> Log { get; } // TODO: remove old log functionality
         public EventHandler GameFinished { get; set; }
         public Player CurrentPlayer { get; set; }
         public Game CurrentGame { get; private set; }
 
         public GameMaster(Player playerOne, Player playerTwo)
         {
+            _pendingMessages = new Queue<GameMessage>();
+            _worker = null;
             Log = new List<string>();
             _statusListeners = new HashSet<IGameStatusListener>();
             _responseListeners = new HashSet<IPlayerResponseListener>();
@@ -70,6 +75,63 @@ namespace gin_rummy.Actors
         {
             // TODO: remove/refactor debug functionality
             _playerOneStartingHand = playerOneStartingHand;
+        }
+
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            const int MaxBufferSize = 50;
+            var buffer = new Queue<GameMessage>();
+
+            lock (_pendingMessages)
+            {
+                for (int i = MaxBufferSize; i > 0 && _pendingMessages.Count > 0; i--)
+                {
+                    buffer.Enqueue(_pendingMessages.Dequeue());
+                }
+            }
+
+            while (buffer.Count > 0)
+            {
+                GameMessage nextMessage = buffer.Dequeue();
+
+                if (nextMessage is PlayerRequestMessage)
+                {
+                    HandleMessage(nextMessage as PlayerRequestMessage);
+                }
+                else
+                {
+                    throw new Exception("Unexpected error - unknown message type.");
+                }
+            }
+        }
+
+        private void HandleMessage(PlayerRequestMessage message)
+        {
+            switch (message.PlayerRequestTypeValue)
+            {
+                case PlayerRequestMessage.PlayerRequestType.DrawDiscard:
+                    RequestDrawDiscard(message);
+                    break;
+                case PlayerRequestMessage.PlayerRequestType.DrawStock:
+                    RequestDrawStock(message);
+                    break;
+                case PlayerRequestMessage.PlayerRequestType.SetDiscard:
+                    RequestPlaceDiscard(message);
+                    break;
+                case PlayerRequestMessage.PlayerRequestType.Knock:
+                    RequestKnock(message);
+                    break;
+                case PlayerRequestMessage.PlayerRequestType.MeldHand:
+                    RequestSetMelds(message);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void BackgroundWorker_WorkCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            _worker = null;
         }
 
         private void InitialiseGame()
@@ -336,26 +398,23 @@ namespace gin_rummy.Actors
 
         public void ReceiveMessage(PlayerRequestMessage request)
         {
-            switch (request.PlayerRequestTypeValue)
+            lock (_pendingMessages)
             {
-                case PlayerRequestMessage.PlayerRequestType.DrawDiscard:
-                    RequestDrawDiscard(request);
-                    break;
-                case PlayerRequestMessage.PlayerRequestType.DrawStock:
-                    RequestDrawStock(request);
-                    break;
-                case PlayerRequestMessage.PlayerRequestType.SetDiscard:
-                    RequestPlaceDiscard(request);
-                    break;
-                case PlayerRequestMessage.PlayerRequestType.Knock:
-                    RequestKnock(request);
-                    break;
-                case PlayerRequestMessage.PlayerRequestType.MeldHand:
-                    RequestSetMelds(request);
-                    break;
-                default:
-                    break;
+                _pendingMessages.Enqueue(request);
             }
+
+            if (_worker == null)
+            {
+                SpawnBackgroundWorkerToHandleMessage();
+            }
+        }
+
+        private void SpawnBackgroundWorkerToHandleMessage()
+        {
+            _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
+            _worker.DoWork += BackgroundWorker_DoWork;
+            _worker.RunWorkerCompleted += BackgroundWorker_WorkCompleted;
+            _worker.RunWorkerAsync();
         }
     }
 }

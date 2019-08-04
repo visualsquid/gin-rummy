@@ -19,7 +19,7 @@ namespace gin_rummy.Messaging
         private readonly Queue<GameMessage> _pendingMessages;
         private readonly Queue<string> _pendingLogs;
         private readonly BackgroundWorker _foreman;
-        private readonly BackgroundWorker _worker;
+        private BackgroundWorker _worker;
 
         public TextBox MemoBox { get; set; }
 
@@ -30,9 +30,7 @@ namespace gin_rummy.Messaging
             _foreman = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
             _foreman.DoWork += BackgroundForeman_DoWork;
             _foreman.RunWorkerAsync();
-            _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
-            _worker.DoWork += BackgroundWorker_DoWork;
-            _worker.RunWorkerCompleted += BackgroundWorker_WorkCompleted;
+            _worker = null;
         }
 
         public List<string> GetLog()
@@ -73,8 +71,11 @@ namespace gin_rummy.Messaging
             {
                 lock (_pendingMessages)
                 {
-                    if (_pendingMessages.Count > 0 && !_worker.IsBusy)
+                    if (_pendingMessages.Count > 0 && _worker == null)
                     {
+                        _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
+                        _worker.DoWork += BackgroundWorker_DoWork;
+                        _worker.RunWorkerCompleted += BackgroundWorker_WorkCompleted;
                         _worker.RunWorkerAsync();
                     }
                 }
@@ -140,6 +141,8 @@ namespace gin_rummy.Messaging
             {
                 WriteLog(_buffer.Dequeue());
             }
+
+            _worker = null;
         }
 
         public override void WriteLog(string message)
