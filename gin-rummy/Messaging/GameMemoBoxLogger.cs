@@ -16,17 +16,23 @@ namespace gin_rummy.Messaging
     public class GameMemoBoxLogger : GameLogger
     {
 
-        private readonly List<GameMessage> _messageBuffer;
-        private readonly List<GameMessage> _wip;
-        private readonly List<string> _logBuffer;
+        private readonly Queue<GameMessage> _pendingMessages;
+        private readonly Queue<string> _pendingLogs;
+        private readonly BackgroundWorker _foreman;
+        private readonly BackgroundWorker _worker;
 
         public TextBox MemoBox { get; set; }
 
         public GameMemoBoxLogger()
         {
-            _messageBuffer = new List<GameMessage>();
-            _logBuffer = new List<string>();
-            _wip = new List<GameMessage>();
+            _pendingMessages = new Queue<GameMessage>();
+            _pendingLogs = new Queue<string>();
+            _foreman = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
+            _foreman.DoWork += BackgroundForeman_DoWork;
+            _foreman.RunWorkerAsync();
+            _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
+            _worker.DoWork += BackgroundWorker_DoWork;
+            _worker.RunWorkerCompleted += BackgroundWorker_WorkCompleted;
         }
 
         public List<string> GetLog()
@@ -54,114 +60,96 @@ namespace gin_rummy.Messaging
 
         private void ReceiveMessage(GameMessage message)
         {
-            lock (_messageBuffer)
+            lock (_pendingMessages)
             {
-                _messageBuffer.Add(message);
+                _pendingMessages.Enqueue(message);
             }
-            SpawnBackgroundWorkerToWriteLog();
         }
 
-        private void SpawnBackgroundWorkerToWriteLog()
+        private void BackgroundForeman_DoWork(object sender, DoWorkEventArgs e)
         {
-            var worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
-            worker.DoWork += BackgroundWorker_DoWork;
-            worker.RunWorkerCompleted += BackgroundWorker_WorkCompleted;
-            worker.RunWorkerAsync();
-        }
-
-        public bool HasPendingWork()
-        {
-            bool result;
-
-            lock (_messageBuffer)
+            const int SleepTimeMs = 500;
+            while (true)
             {
-                lock (_wip)
+                lock (_pendingMessages)
                 {
-                    lock (_logBuffer)
+                    if (_pendingMessages.Count > 0 && !_worker.IsBusy)
                     {
-                        result = _wip.Count > 0 || _messageBuffer.Count > 0 || _logBuffer.Count > 0;
+                        _worker.RunWorkerAsync();
                     }
                 }
+                Thread.Sleep(SleepTimeMs);
             }
-
-            return result;
         }
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            GameMessage nextMessage = null;
-            lock (_messageBuffer)
-            {
-                lock (_wip)
+            const int MaxBatchSize = 50;
+            Queue<GameMessage> _buffer = new Queue<GameMessage>();
+            
+            lock (_pendingMessages)
+            { 
+                for(int i = MaxBatchSize; i > 0 && _pendingMessages.Count > 0; i--)
                 {
-                    if (_messageBuffer.Count > 0)
-                    {
-                        nextMessage = _messageBuffer[0];
-                        _messageBuffer.RemoveAt(0);
-                    }
-
-                    _wip.Add(nextMessage);
+                    _buffer.Enqueue(_pendingMessages.Dequeue());
                 }
             }
 
-            if (nextMessage == null)
+            while (_buffer.Count > 0)
             {
-                return;
-            }
-
-            string nextLog = "";
-            if (nextMessage is GameStatusMessage)
-            {
-                nextLog = ParseGameStatusMessage(nextMessage as GameStatusMessage);
-            }
-            else if (nextMessage is PlayerRequestMessage)
-            {
-                nextLog = ParsePlayerRequestMessage(nextMessage as PlayerRequestMessage);
-            }
-            else if (nextMessage is PlayerResponseMessage)
-            {
-                nextLog = ParsePlayerResponseMessage(nextMessage as PlayerResponseMessage);
-            }
-            else
-            {
-                nextLog = "Unexpected error - unknown message type.";
-            }
-
-            lock (_wip)
-            {
-                lock (_logBuffer)
+                GameMessage nextMessage = _buffer.Dequeue();
+                string nextLog = "";
+                if (nextMessage is GameStatusMessage)
                 {
-                    _logBuffer.Add(nextLog);
+                    nextLog = ParseGameStatusMessage(nextMessage as GameStatusMessage);
                 }
-                _wip.Remove(nextMessage);
+                else if (nextMessage is PlayerRequestMessage)
+                {
+                    nextLog = ParsePlayerRequestMessage(nextMessage as PlayerRequestMessage);
+                }
+                else if (nextMessage is PlayerResponseMessage)
+                {
+                    nextLog = ParsePlayerResponseMessage(nextMessage as PlayerResponseMessage);
+                }
+                else
+                {
+                    nextLog = "Unexpected error - unknown message type.";
+                }
+
+                lock (_pendingLogs)
+                {
+                    _pendingLogs.Enqueue(nextLog);
+                }
             }
         }
 
         private void BackgroundWorker_WorkCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            string nextLog = null;
-            lock (_logBuffer)
+            const int MaxBatchSize = 50;
+            var _buffer = new Queue<string>();
+
+            lock (_pendingLogs)
             {
-                if (_logBuffer.Count > 0)
+                for (int i = MaxBatchSize; i > 0 && _pendingLogs.Count > 0; i--)
                 {
-                    nextLog = _logBuffer[0];
-                    _logBuffer.RemoveAt(0);
+                    _buffer.Enqueue(_pendingLogs.Dequeue());
                 }
             }
 
-            if (nextLog == null)
+            while (_buffer.Count > 0)
             {
-                return;
+                WriteLog(_buffer.Dequeue());
             }
-
-            WriteLog(nextLog);
         }
 
         public override void WriteLog(string message)
         {
             lock (MemoBox)
             {
-                MemoBox.AppendText(message);
+                MemoBox.Invoke((MethodInvoker)delegate
+                {
+                    MemoBox.AppendText(message);
+                });
             }
         }
 
