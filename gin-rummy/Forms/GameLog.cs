@@ -21,7 +21,7 @@ namespace gin_rummy.Forms
             InitializeComponent();
             _gameLogger = new GameMemoBoxLogger();
             _gameLogger.MemoBox = eLog;
-            gameMaster.RegisterGameMessageListener(_gameLogger);
+            gameMaster.RegisterGameStatusListener(_gameLogger);
         }
 
     }

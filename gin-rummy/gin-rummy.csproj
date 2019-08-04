@@ -98,6 +98,7 @@
     <Compile Include="GameStructures\Game.cs" />
     <Compile Include="GameStructures\Hand.cs" />
     <Compile Include="GameStructures\Meld.cs" />
+    <Compile Include="GameStructures\MeldedHand.cs" />
     <Compile Include="GameStructures\Showdown.cs" />
     <Compile Include="GameStructures\Table.cs" />
     <Compile Include="Forms\GameForm.cs">
@@ -111,7 +112,10 @@
     <Compile Include="Messaging\GameMessage.cs" />
     <Compile Include="Messaging\GameStatusMessage.cs" />
     <Compile Include="Messaging\IGameMessageListener.cs" />
+    <Compile Include="Messaging\IPlayerActionListener.cs" />
+    <Compile Include="Messaging\IPlayerResponseListener.cs" />
     <Compile Include="Messaging\PlayerActionMessage.cs" />
+    <Compile Include="Messaging\PlayerResponseMessage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Controls\CardPanel.resx">

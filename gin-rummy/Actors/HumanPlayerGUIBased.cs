@@ -4,37 +4,66 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using gin_rummy.Cards;
+using gin_rummy.GameStructures;
+using gin_rummy.Messaging;
 
 namespace gin_rummy.Actors
 {
-    class HumanPlayerGUIBased : Player
+    public class HumanPlayerGUIBased : Player
     {
+
         public HumanPlayerGUIBased(string name) : base(name)
         {
+            // No work
         }
 
-        private bool DrawCard(out Card drawnCard, out string error)
+        public void RequestKnock()
         {
-            if (_gameMaster.RequestDrawDiscard(this, out drawnCard, out error))
-            {
-                this._hand.AddCard(drawnCard);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            NotifyRequestListeners(new PlayerRequestMessage(PlayerRequestMessage.PlayerRequestType.Knock, this));
         }
 
-        public bool DrawStock(out Card drawnCard, out string error)
+        public void RequestDrawDiscard()
         {
-            return DrawCard(out drawnCard, out error);
+            NotifyRequestListeners(new PlayerRequestMessage(PlayerRequestMessage.PlayerRequestType.DrawDiscard, this));
         }
 
-        public bool DrawDiscard(out Card drawnCard, out string error)
+        public void RequestDrawStock()
         {
-            return DrawCard(out drawnCard, out error);
+            NotifyRequestListeners(new PlayerRequestMessage(PlayerRequestMessage.PlayerRequestType.DrawStock, this));
         }
+
+        public void RequestDiscard(Card discard)
+        {
+            NotifyRequestListeners(new PlayerRequestMessage(PlayerRequestMessage.PlayerRequestType.SetDiscard, this, discard));
+        }
+
+        public void RequestSetMelds(MeldedHand hand)
+        {
+            NotifyRequestListeners(new PlayerRequestMessage(PlayerRequestMessage.PlayerRequestType.MeldHand, this, hand));
+        }
+
+        //private bool DrawCard(out Card drawnCard, out string error)
+        //{
+        //if (_gameMaster.RequestDrawDiscard(this, out drawnCard, out error))
+        //{
+        //    this._hand.AddCard(drawnCard);
+        //    return true;
+        //}
+        //else
+        //{
+        //    return false;
+        //}
+        //}
+
+        //public bool DrawStock(out Card drawnCard, out string error)
+        //{
+        //    return DrawCard(out drawnCard, out error);
+        //}
+
+        //public bool DrawDiscard(out Card drawnCard, out string error)
+        //{
+        //    return DrawCard(out drawnCard, out error);
+        //}
 
         protected override void ThreadedRequestLayOffs()
         {
@@ -49,6 +78,16 @@ namespace gin_rummy.Actors
         protected override void ThreadedYourTurn()
         {
             //TODO: notify/enable the GUI
+        }
+
+        public override void ReceiveMessage(GameStatusMessage message)
+        {
+            // TODO: do we need to do anything here?
+        }
+
+        public override void ReceiveMessage(PlayerResponseMessage message)
+        {
+            // TODO: do we need to do anything here?
         }
     }
 }

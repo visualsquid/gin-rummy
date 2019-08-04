@@ -15,9 +15,19 @@ namespace gin_rummy.Messaging
         
         public TextBox MemoBox { get; set; }
 
-        public override void ReceiveMessage(GameMessage message)
+        public override void ReceiveMessage(GameStatusMessage message)
         {
-            WriteLog(ParseGameMessage(message));
+            WriteLog(ParseGameStatusMessage(message));
+        }
+
+        public override void ReceiveMessage(PlayerRequestMessage message)
+        {
+            WriteLog(ParsePlayerRequestMessage(message));
+        }
+
+        public override void ReceiveMessage(PlayerResponseMessage message)
+        {
+            WriteLog(ParsePlayerResponseMessage(message));
         }
 
         public override void WriteLog(string message)
@@ -25,19 +35,28 @@ namespace gin_rummy.Messaging
             MemoBox.AppendText(message);
         }
 
-        private string ParseGameMessage(GameMessage message)
+        private string ParsePlayerResponseMessage(PlayerResponseMessage response)
         {
-            if (message is GameStatusMessage)
+            bool requestAccepted = response.Response == PlayerResponseMessage.PlayerResponseType.Accepted;
+
+            if (!requestAccepted)
             {
-                return ParseGameStatusMessage(message as GameStatusMessage);
+                return $"Denied: {response.ErrorMessage}";
             }
-            else if (message is PlayerActionMessage)
-            {
-                return ParsePlayerActionMessage(message as PlayerActionMessage);
-            }
-            else
-            {
-                throw new ArgumentException("Message type is not recognised.");
+            else {
+                switch (response.Request.PlayerRequestTypeValue)
+                {
+                    case PlayerRequestMessage.PlayerRequestType.DrawDiscard:
+                        return $"{response.Player.Name} draws discard {response.Card.ToString()}.";
+                    case PlayerRequestMessage.PlayerRequestType.DrawStock:
+                        return $"{response.Player.Name} draws stock.";
+                    case PlayerRequestMessage.PlayerRequestType.SetDiscard:
+                        return $"{response.Player.Name} sets discard {response.Card.ToString()}.";
+                    case PlayerRequestMessage.PlayerRequestType.Knock:
+                        return $"{response.Player.Name} knocks.";
+                    default:
+                        return "Unknown message";
+                }
             }
         }
 
@@ -51,28 +70,29 @@ namespace gin_rummy.Messaging
                     return $"{message.Player.Name}'s turn.";
                 case GameStatusMessage.GameStatusChange.StartMeld:
                     return $"{message.Player.Name}: meld your cards!";
+                case GameStatusMessage.GameStatusChange.StartLayoff:
+                    return $"{message.Player.Name}: layoff now!";
                 default:
                     return "Unknown message";
             }
         }
 
-        private string ParsePlayerActionMessage(PlayerActionMessage message)
+        private string ParsePlayerRequestMessage(PlayerRequestMessage message)
         {
-            switch (message.PlayerActionValue)
+            switch (message.PlayerRequestTypeValue)
             {
-                case PlayerActionMessage.PlayerAction.DrawDiscard:
-                    return $"{message.Player.Name} took discard {message.Card.ToString()}.";
-                case PlayerActionMessage.PlayerAction.DrawStock:
-                    return $"{message.Player.Name} drew stock.";
-                case PlayerActionMessage.PlayerAction.SetDiscard:
-                    return $"{message.Player.Name} set discard {message.Card.ToString()}.";
-                case PlayerActionMessage.PlayerAction.Knock:
-                    return $"{message.Player.Name} knocked.";
+                case PlayerRequestMessage.PlayerRequestType.DrawDiscard:
+                    return $"{message.Player.Name} requests discard...";
+                case PlayerRequestMessage.PlayerRequestType.DrawStock:
+                    return $"{message.Player.Name} requests stock...";
+                case PlayerRequestMessage.PlayerRequestType.SetDiscard:
+                    return $"{message.Player.Name} requests to discard {message.Card.ToString()}.";
+                case PlayerRequestMessage.PlayerRequestType.Knock:
+                    return $"{message.Player.Name} requests knock...";
                 default:
                     return "Unknown message";
             }
         }
-
 
     }
 }

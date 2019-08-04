@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using gin_rummy.ControlsHelpers;
 using gin_rummy.Cards;
 using gin_rummy.Actors;
+using gin_rummy.GameStructures;
 
 namespace gin_rummy.Controls
 {
@@ -28,6 +29,7 @@ namespace gin_rummy.Controls
         public delegate void UserAcceptsSelectionHandler();
 
         private Hand _hand;
+        // TODO: Clean up these mappings into a single class and list
         private Dictionary<Button, CardPanel> _clearButtonMappings;
         private Dictionary<CardPanel, CheckBox> _meldValidCheckBoxMappings;
         private MeldChecker _meldChecker;
@@ -43,7 +45,6 @@ namespace gin_rummy.Controls
             InitializeComponent();
             InitialiseClearButtonMappings(out _clearButtonMappings);
             InitialiseMeldValidCheckboxMappings(out _meldValidCheckBoxMappings);
-            _hand = hand;
             _meldChecker = new MeldChecker();
             SuitColourScheme = suitColourScheme;
             InitialiseMeldValidityDisplays();
@@ -52,7 +53,31 @@ namespace gin_rummy.Controls
             InitialiseMeldPanel(pMeldTwo);
             InitialiseMeldPanel(pMeldThree);
             InitialiseMeldPanel(pMeldFour);
+            _hand = hand;
             DisplayHand(_hand);
+        }
+
+        public MeldCreator(MeldedHand meldedHand, SuitColourScheme suitColourScheme) : this(new Hand(meldedHand.Deadwood), suitColourScheme)
+        {
+            // TODO: Clean this up
+            pHand.Clear();
+            pHand.AddCards(meldedHand.Deadwood);
+            if (meldedHand.Melds.Count > 0)
+            {
+                pMeldOne.AddCards(meldedHand.Melds[0].GetListOfCardsInMeld());
+            }
+            if (meldedHand.Melds.Count > 1)
+            {
+                pMeldOne.AddCards(meldedHand.Melds[1].GetListOfCardsInMeld());
+            }
+            if (meldedHand.Melds.Count > 2)
+            {
+                pMeldOne.AddCards(meldedHand.Melds[2].GetListOfCardsInMeld());
+            }
+            if (meldedHand.Melds.Count > 3)
+            {
+                pMeldOne.AddCards(meldedHand.Melds[3].GetListOfCardsInMeld());
+            }
         }
 
         private void InitialiseMeldValidityDisplays()
@@ -62,11 +87,16 @@ namespace gin_rummy.Controls
             _meldDisplayEmpty= new MeldValidityDisplay() { CheckboxColour = Color.SlateGray, CheckboxState = CheckState.Indeterminate };
         }
 
-        public List<Meld> GetMelds()
+        public MeldedHand GetMeldedHand()
+        {
+            return new MeldedHand(GetMelds(), GetUnmeldedCards());
+        }
+
+        private List<Meld> GetMelds()
         {
             List<Meld> melds = new List<Meld>();
 
-            foreach (CardPanel cardPanel in new CardPanel[] {pMeldOne, pMeldTwo, pMeldThree, pMeldFour}) 
+            foreach (CardPanel cardPanel in new CardPanel[] {pMeldOne, pMeldTwo, pMeldThree, pMeldFour}.Where(i => i.GetCards().Count > 0)) 
             {
                 Meld meld = new Meld();
                 foreach(Card card in cardPanel.GetCards())
@@ -78,7 +108,7 @@ namespace gin_rummy.Controls
             return melds;
         }
 
-        public List<Card> GetUnmeldedCards()
+        private List<Card> GetUnmeldedCards()
         {
             return pHand.GetCards();
         }
@@ -197,6 +227,10 @@ namespace gin_rummy.Controls
             {
                 display = isMeldValid ? _meldDisplayValid : _meldDisplayInvalid;
             }
+
+            var checkbox = _meldValidCheckBoxMappings[cardPanel];
+            checkbox.CheckState = display.CheckboxState;
+            checkbox.BackColor = display.CheckboxColour;
         }
 
         private void bClearMeldAny_Click(object sender, EventArgs e)

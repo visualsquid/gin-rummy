@@ -1,4 +1,6 @@
 ﻿using gin_rummy.Cards;
+using gin_rummy.GameStructures;
+using gin_rummy.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,27 +73,23 @@ namespace gin_rummy.Actors
 
         protected override void ThreadedYourTurn()
         {
-            string error = "";
-            bool success = false;
-            Card drawnCard = null;
-            while (!success)
+            switch (GetNextTicket())
             {
-                switch (GetNextTicket())
-                {
-                    case TicketType.Knock:
-                        success = _gameMaster.RequestKnock(this, out error);
-                        break;
-                    case TicketType.DrawDiscard:
-                        success = (_gameMaster.RequestDrawDiscard(this, out drawnCard, out error) && _gameMaster.RequestPlaceDiscard(this, GetRandomCardFromHand(), out error));
-                        break;
-                    case TicketType.DrawStock:
-                        success = (_gameMaster.RequestDrawStock(this, out drawnCard, out error) && _gameMaster.RequestPlaceDiscard(this, GetRandomCardFromHand(), out error));
-                        break;
-                    default:
-                        throw new Exception("Ticket type not supported.");
-                }
+                case TicketType.Knock:
+                    NotifyRequestListeners(new PlayerRequestMessage(PlayerRequestMessage.PlayerRequestType.Knock, this));
+                    //success = _gameMaster.RequestKnock(this, out error);
+                    break;
+                case TicketType.DrawDiscard:
+                    NotifyRequestListeners(new PlayerRequestMessage(PlayerRequestMessage.PlayerRequestType.DrawDiscard, this));
+                    //success = (_gameMaster.RequestDrawDiscard(this, out drawnCard, out error) && _gameMaster.RequestPlaceDiscard(this, GetRandomCardFromHand(), out error));
+                    break;
+                case TicketType.DrawStock:
+                    NotifyRequestListeners(new PlayerRequestMessage(PlayerRequestMessage.PlayerRequestType.DrawStock, this));
+                    //success = (_gameMaster.RequestDrawStock(this, out drawnCard, out error) && _gameMaster.RequestPlaceDiscard(this, GetRandomCardFromHand(), out error));
+                    break;
+                default:
+                    throw new Exception("Ticket type not supported.");
             }
-
         }
 
         protected override void ThreadedRequestMelds()
@@ -109,9 +107,9 @@ namespace gin_rummy.Actors
                 meldSet = possibleMeldSets[_random.Next(possibleMeldSets.Count)];
             }
             var deadWood = _meldChecker.GetDeadWood(meldSet, cardsInHand);
-            string error;
-            Meld invalidMeld;
-            _gameMaster.RequestSetMelds(this, meldSet, deadWood, out error, out invalidMeld);
+            
+            NotifyRequestListeners(new PlayerRequestMessage(PlayerRequestMessage.PlayerRequestType.MeldHand, this, new MeldedHand(meldSet, deadWood)));
+            //_gameMaster.RequestSetMelds(this, new MeldedHand(meldSet, deadWood), out error, out invalidMeld);
         }
 
         protected override void ThreadedRequestLayOffs()
@@ -119,6 +117,71 @@ namespace gin_rummy.Actors
             // TODO: implement random CPU get lay offs
             //_gameMaster.?
             throw new NotImplementedException();
+        }
+
+        public override void ReceiveMessage(GameStatusMessage message)
+        {
+            switch (message.GameStatusChangeValue)
+            {
+                case GameStatusMessage.GameStatusChange.GameInitialised:
+                    // No work
+                    break;
+                case GameStatusMessage.GameStatusChange.StartTurn:
+                    if (message.Player == this)
+                    {
+                        ThreadedYourTurn();
+                    }
+                    break;
+                case GameStatusMessage.GameStatusChange.StartMeld:
+                    if (message.Player == this)
+                    {
+                        ThreadedRequestMelds();
+                    }
+                    break;
+                case GameStatusMessage.GameStatusChange.StartLayoff:
+                    if (message.Player == this)
+                    {
+                        ThreadedRequestLayOffs();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public override void ReceiveMessage(PlayerResponseMessage message)
+        {
+            if (message.Player != this)
+            {
+                return;
+            }
+
+            if (message.Response == PlayerResponseMessage.PlayerResponseType.Denied)
+            {
+                // Do nothing - GameMaster will ask us to perform again.
+                return;
+            }
+
+            switch (message.Request.PlayerRequestTypeValue)
+            {
+                case PlayerRequestMessage.PlayerRequestType.DrawDiscard:
+                    NotifyRequestListeners(new PlayerRequestMessage(PlayerRequestMessage.PlayerRequestType.SetDiscard, this, GetRandomCardFromHand()));
+                    break;
+                case PlayerRequestMessage.PlayerRequestType.DrawStock:
+                    NotifyRequestListeners(new PlayerRequestMessage(PlayerRequestMessage.PlayerRequestType.SetDiscard, this, GetRandomCardFromHand()));
+                    break;
+                case PlayerRequestMessage.PlayerRequestType.SetDiscard:
+                    // Do nothing
+                    break;
+                case PlayerRequestMessage.PlayerRequestType.Knock:
+                    // Do nothing
+                    break;
+                case PlayerRequestMessage.PlayerRequestType.MeldHand:
+                    // Do nothing
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

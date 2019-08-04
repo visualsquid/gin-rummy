@@ -16,11 +16,12 @@ using gin_rummy.Messaging;
 
 namespace gin_rummy.Forms
 {
-    public partial class GameForm : Form, IGameMessageListener
+    public partial class GameForm : Form, IGameStatusListener, IPlayerResponseListener
     {
         private Game _game;
         private GameMaster _gameMaster;
         private GameLog _gameLog;
+        private HumanPlayerGUIBased _player;
 
         public GameForm()
         {
@@ -79,45 +80,27 @@ namespace gin_rummy.Forms
 
         private void PlayerEventKnock()
         {
-            string error;
-
-            if (!_gameMaster.RequestKnock(_gameMaster.CurrentPlayer, out error))
-            {
-                MessageBox.Show($"Denied: {error}"); // TODO: what should we actually do here?
-            }
+            // TODO: Disable controls
+            _player.RequestKnock();
         }
 
         private void StacksEventStockDrawn()
         {
-            Card drawnCard;
-            string error;
-
-            if (!_gameMaster.RequestDrawStock(_gameMaster.CurrentPlayer, out drawnCard, out error))
-            {
-                MessageBox.Show($"Denied: {error}"); // TODO: what should we actually do here?
-            }
+            // TODO: Disable controls
+            _player.RequestDrawStock();
         }
 
         private void StacksEventDiscardTaken()
         {
-            Card drawnCard;
-            string error;
-
-            if (!_gameMaster.RequestDrawDiscard(_gameMaster.CurrentPlayer, out drawnCard, out error))
-            {
-                MessageBox.Show($"Denied: {error}"); // TODO: what should we actually do here?
-            }
+            // TODO: Disable controls
+            _player.RequestDrawDiscard();
         }
 
         private void StacksEventDiscardPlaced()
         {
-            string error;
-
-            Card selectedCard = pYourHand.GetSelectedCard();
-            if (!_gameMaster.RequestPlaceDiscard(_gameMaster.CurrentPlayer, selectedCard, out error))
-            {
-                MessageBox.Show($"Denied: {error}"); // TODO: what should we actually do here?
-            }
+            Card discard = pYourHand.GetSelectedCard();
+            // TODO: Disable controls
+            _player.RequestDiscard(discard);
         }
 
         private void CardPanelCardSelected(Card card, out bool removeCard)
@@ -128,9 +111,12 @@ namespace gin_rummy.Forms
 
         private void randomplayCPUToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            _gameMaster = new GameMaster(new HumanPlayerGUIBased("Ya boi"), new RandomCPUPlayer("Dave"));
+            // TODO: Remove/factor debug functionality
+            _player = new HumanPlayerGUIBased("Ya boi");
+            _gameMaster = new GameMaster(_player, new RandomCPUPlayer("Dave"), new Hand(new Card[] { new Card("Ks"), new Card("Kd"), new Card("Kc"), new Card("Kh"), new Card("Qh"), new Card("Qs"), new Card("Qd"), new Card("Jh"), new Card("Js") }.ToList()));
             _game = _gameMaster.CurrentGame;
-            _gameMaster.RegisterGameMessageListener(this);
+            _gameMaster.RegisterGameStatusListener(this);
+            _gameMaster.RegisterPlayerResponseListener(this);
             InitialiseAndShowLogScreen();
             _gameMaster.StartGame();
         }
@@ -157,104 +143,129 @@ namespace gin_rummy.Forms
             MessageBox.Show(string.Join("\n", _gameMaster.Log));
         }
 
-        public void ReceiveMessage(GameMessage message)
+        public void ReceiveMessage(GameStatusMessage message)
         {
-            HandleMessage(message);
-        }
+            string error;
+            Meld invalidMeld;
 
-        private void HandleMessage(GameMessage message)
-        {
-            if (message is PlayerActionMessage)
+            switch (message.GameStatusChangeValue)
             {
-                PlayerActionMessage actionMessage = (PlayerActionMessage)message;
-                CardPanel relevantCardPanel = actionMessage.Player == _game.PlayerOne ? pYourHand : pOpponentsHand;
-                switch (actionMessage.PlayerActionValue)
-                {
-                    case PlayerActionMessage.PlayerAction.DrawDiscard:
-                        relevantCardPanel.AddCard(actionMessage.Card);
-                        pStacks.DiscardCount--;
-                        pStacks.VisibleDiscard = _game.GetVisibleDiscard();
-                        pActions.AllowDraw = false;
-                        pActions.AllowTake = false;
-                        pActions.AllowDiscard = true;
-                        break;
-                    case PlayerActionMessage.PlayerAction.DrawStock:
-                        pStacks.StockCount--;
-                        relevantCardPanel.AddCard(actionMessage.Card);
-                        pActions.AllowDraw = false;
-                        pActions.AllowTake = false;
-                        pActions.AllowDiscard = true;
-                        break;
-                    case PlayerActionMessage.PlayerAction.SetDiscard:
-                        pStacks.DiscardCount++;
-                        pStacks.VisibleDiscard = actionMessage.Card;
-                        relevantCardPanel.RemoveCard(actionMessage.Card);
-                        pActions.AllowDraw = false;
-                        pActions.AllowTake = false;
-                        pActions.AllowDiscard = false;
-                        break;
-                    case PlayerActionMessage.PlayerAction.Knock:
-                        // Nothing required
-                        break;
-                    default:
-                        break;
-                }
-            }
-            else if (message is GameStatusMessage)
-            {
-                GameStatusMessage statusMessage = (GameStatusMessage)message;
-                Player humanPlayer = _game.PlayerOne; // TODO: assumes PlayerOne is always the human player
-                switch (statusMessage.GameStatusChangeValue)
-                {
-                    case GameStatusMessage.GameStatusChange.GameInitialised:
-                        pYourHand.Clear();
-                        InitialisePlayerCardPanel(pYourHand);
-                        foreach (Card c in humanPlayer.GetCards())
-                        {
-                            pYourHand.AddCard(c);
-                        }
+                case GameStatusMessage.GameStatusChange.GameInitialised:
+                    pYourHand.Clear();
+                    InitialisePlayerCardPanel(pYourHand);
+                    foreach (Card c in _player.GetCards())
+                    {
+                        pYourHand.AddCard(c);
+                    }
 
-                        pOpponentsHand.Clear();
-                        InitialiseOpponentCardPanel(pOpponentsHand);
-                        foreach (Card c in _game.PlayerTwo.GetCards())
-                        {
-                            pOpponentsHand.AddCard(c);
-                        }
+                    pOpponentsHand.Clear();
+                    InitialiseOpponentCardPanel(pOpponentsHand);
+                    foreach (Card c in _game.PlayerTwo.GetCards())
+                    {
+                        pOpponentsHand.AddCard(c);
+                    }
 
-                        InitialiseStacks(_game.GetStockCount(), _game.GetVisibleDiscard());
-                        InitialisePlayerActions();
-                        break;
-                    case GameStatusMessage.GameStatusChange.StartTurn:
-                        if (statusMessage.Player == humanPlayer)
-                        {
-                            pActions.AllowTake = true;
-                            pActions.AllowDraw = true;
-                            pActions.AllowKnock = true;
-                        }
-                        else
-                        {
-                            pActions.AllowTake = false;
-                            pActions.AllowDraw = false;
-                            pActions.AllowKnock = false;
-                        }
-                        break;
-                    case GameStatusMessage.GameStatusChange.StartMeld:
-                        var meldCreator = ShowMeldCreator(humanPlayer);
-                        string error;
-                        Meld invalidMeld;
+                    InitialiseStacks(_game.GetStockCount(), _game.GetVisibleDiscard());
+                    InitialisePlayerActions();
+                    break;
+                case GameStatusMessage.GameStatusChange.StartTurn:
+                    if (message.Player == _player)
+                    {
+                        pActions.AllowTake = true;
+                        pActions.AllowDraw = true;
+                        pActions.AllowKnock = true;
+                    }
+                    else
+                    {
+                        pActions.AllowTake = false;
+                        pActions.AllowDraw = false;
+                        pActions.AllowKnock = false;
+                    }
+                    break;
+                case GameStatusMessage.GameStatusChange.StartMeld:
+                    if (message.Player == _player)
+                    {
+                        var meldCreator = ShowMeldCreator(_player);
                         // TODO: what if this fails? Stick it in a loop?
-                        _gameMaster.RequestSetMelds(_game.PlayerTwo, meldCreator.GetMelds(), meldCreator.GetUnmeldedCards(), out error, out invalidMeld);
-                        break;
-                    default:
-                        break;
-                }
+                        _player.RequestSetMelds(new MeldedHand(meldCreator.GetMeldedHand().Melds, meldCreator.GetMeldedHand().Deadwood));
+                        //_gameMaster.RequestSetMelds(_game.PlayerOne, new MeldedHand(meldCreator.GetMeldedHand().Melds, meldCreator.GetMeldedHand().Deadwood), out error, out invalidMeld);
+                    }
+                    break;
+                case GameStatusMessage.GameStatusChange.StartLayoff:
+                    if (message.Player == _player)
+                    {
+                        var layoffControl = ShowLayoffControl(message.Player.MeldedHand, message.OpponentsMeldedHand); // Again, assuming player two is the opponent
+                        // TODO: what if this fails? Stick it in a loop?
+                        // TODO: Need a HumanPlayerGUIBased.RequestSetLayoffs or some such
+                    }
+                    break;
+                default:
+                    break;
             }
         }
+
+        public void ReceiveMessage(PlayerResponseMessage response)
+        {
+            if (response.Response == PlayerResponseMessage.PlayerResponseType.Denied)
+            {
+                // Nothing to do - we'll get another message from the GameMaster to begin again
+                return;
+            }
+
+            CardPanel relevantCardPanel = response.Player == _player ? pYourHand : pOpponentsHand;
+            switch (response.Request.PlayerRequestTypeValue)
+            {
+                case PlayerRequestMessage.PlayerRequestType.DrawDiscard:
+                    relevantCardPanel.AddCard(response.Card);
+                    pStacks.DiscardCount--;
+                    pStacks.VisibleDiscard = _game.GetVisibleDiscard();
+                    pActions.AllowDraw = false;
+                    pActions.AllowTake = false;
+                    pActions.AllowDiscard = true;
+                    break;
+                case PlayerRequestMessage.PlayerRequestType.DrawStock:
+                    pStacks.StockCount--;
+                    relevantCardPanel.AddCard(response.Card);
+                    pActions.AllowDraw = false;
+                    pActions.AllowTake = false;
+                    pActions.AllowDiscard = true;
+                    break;
+                case PlayerRequestMessage.PlayerRequestType.SetDiscard:
+                    pStacks.DiscardCount++;
+                    pStacks.VisibleDiscard = response.Card;
+                    relevantCardPanel.RemoveCard(response.Card);
+                    pActions.AllowDraw = false;
+                    pActions.AllowTake = false;
+                    pActions.AllowDiscard = false;
+                    break;
+                case PlayerRequestMessage.PlayerRequestType.Knock:
+                    // Nothing required
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // TODO: it's fucked - messages are being handled like a stack instead of a queue, dammit
 
         private MeldCreator ShowMeldCreator(Player player)
         {
             Form f = new Form();
             MeldCreator mc = new MeldCreator(new Hand(player.GetCards()), GetSelectedSuitColourScheme());
+            f.Width = mc.Width;
+            f.Height = mc.Height;
+            mc.Dock = DockStyle.Fill;
+            mc.OnUserAcceptsSelection = delegate () { f.Hide(); };
+            f.Controls.Add(mc);
+            f.ShowDialog();
+
+            return mc;
+        }
+
+        private MeldCreator ShowLayoffControl(MeldedHand yourHand, MeldedHand opponentsHand)
+        {
+            Form f = new Form();
+            MeldCreator mc = new MeldCreator(new MeldedHand(opponentsHand.Melds, yourHand.Deadwood), GetSelectedSuitColourScheme());
             f.Width = mc.Width;
             f.Height = mc.Height;
             mc.Dock = DockStyle.Fill;

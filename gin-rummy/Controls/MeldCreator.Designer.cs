@@ -58,11 +58,7 @@
             this.pTableLayout.ColumnCount = 3;
             this.pTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 83.33334F));
             this.pTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 16.66667F));
-<<<<<<< HEAD
-            this.pTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 60F));
-=======
             this.pTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 57F));
->>>>>>> create-meld-controls
             this.pTableLayout.Controls.Add(this.bClearMeldFour, 1, 4);
             this.pTableLayout.Controls.Add(this.bClearMeldThree, 1, 3);
             this.pTableLayout.Controls.Add(this.pMeldFour, 0, 4);
@@ -93,11 +89,7 @@
             // bClearMeldFour
             // 
             this.bClearMeldFour.Dock = System.Windows.Forms.DockStyle.Fill;
-<<<<<<< HEAD
-            this.bClearMeldFour.Location = new System.Drawing.Point(662, 307);
-=======
             this.bClearMeldFour.Location = new System.Drawing.Point(664, 307);
->>>>>>> create-meld-controls
             this.bClearMeldFour.Name = "bClearMeldFour";
             this.bClearMeldFour.Size = new System.Drawing.Size(125, 70);
             this.bClearMeldFour.TabIndex = 14;
@@ -108,11 +100,7 @@
             // bClearMeldThree
             // 
             this.bClearMeldThree.Dock = System.Windows.Forms.DockStyle.Fill;
-<<<<<<< HEAD
-            this.bClearMeldThree.Location = new System.Drawing.Point(662, 231);
-=======
             this.bClearMeldThree.Location = new System.Drawing.Point(664, 231);
->>>>>>> create-meld-controls
             this.bClearMeldThree.Name = "bClearMeldThree";
             this.bClearMeldThree.Size = new System.Drawing.Size(125, 70);
             this.bClearMeldThree.TabIndex = 13;
@@ -120,104 +108,6 @@
             this.bClearMeldThree.UseVisualStyleBackColor = true;
             this.bClearMeldThree.Click += new System.EventHandler(this.bClearMeldAny_Click);
             // 
-<<<<<<< HEAD
-            // pButtons
-            // 
-            this.pTableLayout.SetColumnSpan(this.pButtons, 2);
-            this.pButtons.Controls.Add(this.bAcceptMelds);
-            this.pButtons.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pButtons.Location = new System.Drawing.Point(3, 383);
-            this.pButtons.Name = "pButtons";
-            this.pButtons.Size = new System.Drawing.Size(784, 41);
-            this.pButtons.TabIndex = 2;
-            // 
-            // bAcceptMelds
-            // 
-            this.bAcceptMelds.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bAcceptMelds.Enabled = false;
-            this.bAcceptMelds.Location = new System.Drawing.Point(706, 14);
-            this.bAcceptMelds.Name = "bAcceptMelds";
-            this.bAcceptMelds.Size = new System.Drawing.Size(75, 23);
-            this.bAcceptMelds.TabIndex = 0;
-            this.bAcceptMelds.Text = "Accept";
-            this.bAcceptMelds.UseVisualStyleBackColor = true;
-            this.bAcceptMelds.Click += new System.EventHandler(this.bAcceptMelds_Click);
-            // 
-            // bClearMeldOne
-            // 
-            this.bClearMeldOne.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bClearMeldOne.Location = new System.Drawing.Point(662, 79);
-            this.bClearMeldOne.Name = "bClearMeldOne";
-            this.bClearMeldOne.Size = new System.Drawing.Size(125, 70);
-            this.bClearMeldOne.TabIndex = 11;
-            this.bClearMeldOne.Text = "Clear";
-            this.bClearMeldOne.UseVisualStyleBackColor = true;
-            this.bClearMeldOne.Click += new System.EventHandler(this.bClearMeldAny_Click);
-            // 
-            // bClearMeldTwo
-            // 
-            this.bClearMeldTwo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bClearMeldTwo.Location = new System.Drawing.Point(662, 155);
-            this.bClearMeldTwo.Name = "bClearMeldTwo";
-            this.bClearMeldTwo.Size = new System.Drawing.Size(125, 70);
-            this.bClearMeldTwo.TabIndex = 12;
-            this.bClearMeldTwo.Text = "Clear";
-            this.bClearMeldTwo.UseVisualStyleBackColor = true;
-            this.bClearMeldTwo.Click += new System.EventHandler(this.bClearMeldAny_Click);
-            // 
-            // cbMeldOneValid
-            // 
-            this.cbMeldOneValid.AutoSize = true;
-            this.cbMeldOneValid.BackColor = System.Drawing.Color.Red;
-            this.cbMeldOneValid.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.cbMeldOneValid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cbMeldOneValid.Location = new System.Drawing.Point(793, 79);
-            this.cbMeldOneValid.Name = "cbMeldOneValid";
-            this.cbMeldOneValid.Size = new System.Drawing.Size(55, 70);
-            this.cbMeldOneValid.TabIndex = 15;
-            this.cbMeldOneValid.UseVisualStyleBackColor = false;
-            // 
-            // cbMeldTwoValid
-            // 
-            this.cbMeldTwoValid.AutoSize = true;
-            this.cbMeldTwoValid.BackColor = System.Drawing.Color.Red;
-            this.cbMeldTwoValid.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.cbMeldTwoValid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cbMeldTwoValid.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.cbMeldTwoValid.Location = new System.Drawing.Point(793, 155);
-            this.cbMeldTwoValid.Name = "cbMeldTwoValid";
-            this.cbMeldTwoValid.Size = new System.Drawing.Size(55, 70);
-            this.cbMeldTwoValid.TabIndex = 16;
-            this.cbMeldTwoValid.UseVisualStyleBackColor = false;
-            // 
-            // cbMeldThreeValid
-            // 
-            this.cbMeldThreeValid.AutoSize = true;
-            this.cbMeldThreeValid.BackColor = System.Drawing.Color.Red;
-            this.cbMeldThreeValid.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.cbMeldThreeValid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cbMeldThreeValid.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.cbMeldThreeValid.Location = new System.Drawing.Point(793, 231);
-            this.cbMeldThreeValid.Name = "cbMeldThreeValid";
-            this.cbMeldThreeValid.Size = new System.Drawing.Size(55, 70);
-            this.cbMeldThreeValid.TabIndex = 17;
-            this.cbMeldThreeValid.UseVisualStyleBackColor = false;
-            // 
-            // cbMeldFourValid
-            // 
-            this.cbMeldFourValid.AutoSize = true;
-            this.cbMeldFourValid.BackColor = System.Drawing.Color.Red;
-            this.cbMeldFourValid.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.cbMeldFourValid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.cbMeldFourValid.FlatAppearance.CheckedBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.cbMeldFourValid.Location = new System.Drawing.Point(793, 307);
-            this.cbMeldFourValid.Name = "cbMeldFourValid";
-            this.cbMeldFourValid.Size = new System.Drawing.Size(55, 70);
-            this.cbMeldFourValid.TabIndex = 18;
-            this.cbMeldFourValid.UseVisualStyleBackColor = false;
-            // 
-=======
->>>>>>> create-meld-controls
             // pMeldFour
             // 
             this.pMeldFour.AllowDragFrom = false;
@@ -233,11 +123,7 @@
             this.pMeldFour.Location = new System.Drawing.Point(3, 307);
             this.pMeldFour.Name = "pMeldFour";
             this.pMeldFour.ShowCards = false;
-<<<<<<< HEAD
-            this.pMeldFour.Size = new System.Drawing.Size(653, 70);
-=======
             this.pMeldFour.Size = new System.Drawing.Size(655, 70);
->>>>>>> create-meld-controls
             this.pMeldFour.TabIndex = 10;
             // 
             // pMeldThree
@@ -255,11 +141,7 @@
             this.pMeldThree.Location = new System.Drawing.Point(3, 231);
             this.pMeldThree.Name = "pMeldThree";
             this.pMeldThree.ShowCards = false;
-<<<<<<< HEAD
-            this.pMeldThree.Size = new System.Drawing.Size(653, 70);
-=======
             this.pMeldThree.Size = new System.Drawing.Size(655, 70);
->>>>>>> create-meld-controls
             this.pMeldThree.TabIndex = 9;
             // 
             // pMeldTwo
@@ -277,11 +159,7 @@
             this.pMeldTwo.Location = new System.Drawing.Point(3, 155);
             this.pMeldTwo.Name = "pMeldTwo";
             this.pMeldTwo.ShowCards = false;
-<<<<<<< HEAD
-            this.pMeldTwo.Size = new System.Drawing.Size(653, 70);
-=======
             this.pMeldTwo.Size = new System.Drawing.Size(655, 70);
->>>>>>> create-meld-controls
             this.pMeldTwo.TabIndex = 8;
             // 
             // pMeldOne
@@ -299,11 +177,7 @@
             this.pMeldOne.Location = new System.Drawing.Point(3, 79);
             this.pMeldOne.Name = "pMeldOne";
             this.pMeldOne.ShowCards = false;
-<<<<<<< HEAD
-            this.pMeldOne.Size = new System.Drawing.Size(653, 70);
-=======
             this.pMeldOne.Size = new System.Drawing.Size(655, 70);
->>>>>>> create-meld-controls
             this.pMeldOne.TabIndex = 7;
             // 
             // pHand
@@ -323,11 +197,7 @@
             this.pHand.Location = new System.Drawing.Point(3, 3);
             this.pHand.Name = "pHand";
             this.pHand.ShowCards = false;
-<<<<<<< HEAD
-            this.pHand.Size = new System.Drawing.Size(784, 70);
-=======
             this.pHand.Size = new System.Drawing.Size(787, 70);
->>>>>>> create-meld-controls
             this.pHand.TabIndex = 3;
             // 
             // pButtons

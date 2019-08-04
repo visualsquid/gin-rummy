@@ -13,7 +13,7 @@ namespace gin_rummy.Actors
     /// <summary>
     /// Controller class for handling the game. Other actors should make requests of this class in order to progress the game.
     /// </summary>
-    public class GameMaster
+    public class GameMaster : IPlayerRequestListener
     {
 
         public enum ActionErrorType
@@ -35,11 +35,13 @@ namespace gin_rummy.Actors
         private Thread _endGameHandler;
         private Thread _layOffsHandler;
 
-        private HashSet<IGameMessageListener> _messageListeners;
+        private HashSet<IGameStatusListener> _statusListeners;
+        private HashSet<IPlayerResponseListener> _responseListeners;
         private DeadWoodScorer _deadWoodScorer;
         private MeldChecker _meldChecker;
 
         private List<PlayerResults> _playerResults;
+        private Hand _playerOneStartingHand; // TODO: remove/refactor debug functionality
 
         public List<string> Log { get; }
         public EventHandler GameFinished { get; set; }
@@ -49,22 +51,44 @@ namespace gin_rummy.Actors
         public GameMaster(Player playerOne, Player playerTwo)
         {
             Log = new List<string>();
-            _messageListeners = new HashSet<IGameMessageListener>();
+            _statusListeners = new HashSet<IGameStatusListener>();
+            _responseListeners = new HashSet<IPlayerResponseListener>();
             _playerResults = new List<PlayerResults>();
-            _playerResults.Add(new PlayerResults() { Player = playerOne });
-            _playerResults.Add(new PlayerResults() { Player = playerTwo });
             CurrentGame = new Game(playerOne, playerTwo);
+            RegisterGameStatusListener(playerOne);
+            RegisterPlayerResponseListener(playerOne);
+            playerOne.RegisterRequestListener(this);
+            RegisterGameStatusListener(playerTwo);
+            RegisterPlayerResponseListener(playerTwo);
+            playerTwo.RegisterRequestListener(this);
             _deadWoodScorer = new DeadWoodScorer();
             _meldChecker = new MeldChecker();
+        }
+
+
+        public GameMaster(Player playerOne, Player playerTwo, Hand playerOneStartingHand) : this(playerOne, playerTwo)  
+        {
+            // TODO: remove/refactor debug functionality
+            _playerOneStartingHand = playerOneStartingHand;
         }
 
         private void InitialiseGame()
         {
             CurrentGame.ShuffleDeck();
-            CurrentGame.DealHand(CurrentGame.PlayerOne, Game.InitialHandSize);
+            if (_playerOneStartingHand != null)
+            {
+                foreach (Card c in _playerOneStartingHand.ViewHand())
+                {
+                    CurrentGame.PlayerOne.DrawCard(c);
+                }
+            }
+            else
+            {
+                CurrentGame.DealHand(CurrentGame.PlayerOne, Game.InitialHandSize);
+            }
             CurrentGame.DealHand(CurrentGame.PlayerTwo, Game.InitialHandSize);
             CurrentGame.CreateStacks();
-            NotifyGameMessageListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.GameInitialised, null));
+            NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.GameInitialised, null));
         }
 
         public void StartGame()
@@ -73,14 +97,27 @@ namespace gin_rummy.Actors
             StartTurn();
         }
 
-        public void RegisterGameMessageListener(IGameMessageListener listener)
+        public void RegisterGameStatusListener(IGameStatusListener listener)
         {
-            _messageListeners.Add(listener);
+            _statusListeners.Add(listener);
         }
 
-        private void NotifyGameMessageListeners(GameMessage message)
+        private void NotifyGameStatusListeners(GameStatusMessage message)
         {
-            foreach(IGameMessageListener listener in _messageListeners)
+            foreach(var listener in _statusListeners)
+            {
+                listener.ReceiveMessage(message);
+            }
+        }
+
+        public void RegisterPlayerResponseListener(IPlayerResponseListener listener)
+        {
+            _responseListeners.Add(listener);
+        }
+
+        private void NotifyPlayerResponseListeners(PlayerResponseMessage message)
+        {
+            foreach (var listener in _responseListeners)
             {
                 listener.ReceiveMessage(message);
             }
@@ -115,8 +152,8 @@ namespace gin_rummy.Actors
             {
                 CurrentPlayer = CurrentGame.PlayerTwo;
             }
-            CurrentPlayer.YourTurn(this);
-            NotifyGameMessageListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartTurn, CurrentPlayer));
+            //CurrentPlayer.YourTurn(this); // TODO: Sort this out
+            NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartTurn, CurrentPlayer));
         }
 
         private void HandleEndGame()
@@ -131,115 +168,132 @@ namespace gin_rummy.Actors
             finalPlayer.RequestLayOffs(this, currentPlayerResults.Melds);
         }
 
-        public bool RequestKnock(Player player, out string error)
+        public void RequestKnock(PlayerRequestMessage request)
         {
-            if (!ValidateCurrentPlayer(player, out error))
+            string errorMessage = string.Empty;
+
+            if (!ValidateCurrentPlayer(request.Player, out errorMessage))
             {
-                return false;
+                NotifyPlayerResponseListeners(new PlayerResponseMessage(request.Player, request, PlayerResponseMessage.PlayerResponseType.Denied, errorMessage));
+                NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartTurn, request.Player)); // TODO: Not really fair to ask them to start their whole turn again, is it? Also won't work if they've drawn a card...
+                return;
             }
-            else
-            {
-                NotifyGameMessageListeners(new PlayerActionMessage(PlayerActionMessage.PlayerAction.Knock, player));
-                NotifyGameMessageListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartMeld, player));
-                return true;
-            }
+
+            NotifyPlayerResponseListeners(new PlayerResponseMessage(request.Player, request, PlayerResponseMessage.PlayerResponseType.Accepted));
+
+            NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartMeld, CurrentGame.PlayerOne));
+            NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartMeld, CurrentGame.PlayerTwo));
         }
 
-        public bool RequestDrawDiscard(Player player, out Card drawnCard, out string error)
+        public void RequestDrawDiscard(PlayerRequestMessage request)
         {
-            drawnCard = null;
-            if (!ValidateCurrentPlayer(player, out error))
+            Card drawnCard = null;
+            string errorMessage = string.Empty;
+
+            if (!ValidateCurrentPlayer(request.Player, out errorMessage) || !ValidateDiscardsExist(out errorMessage))
             {
-                return false;
+                NotifyPlayerResponseListeners(new PlayerResponseMessage(request.Player, request, PlayerResponseMessage.PlayerResponseType.Denied, errorMessage));
+                NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartTurn, request.Player)); // TODO: Not really fair to ask them to start their whole turn again, is it?
+                return;
             }
-            else if (!ValidateDiscardsExist(out error))
-            {
-                return false;
-            }
-            else
-            {
-                drawnCard = CurrentGame.DrawDiscard();
-                player.DrawCard(drawnCard);
-                NotifyGameMessageListeners(new PlayerActionMessage(PlayerActionMessage.PlayerAction.DrawDiscard, player, drawnCard));
-                return true;
-            }
+
+            drawnCard = CurrentGame.DrawDiscard();
+            request.Player.DrawCard(drawnCard);
+
+            NotifyPlayerResponseListeners(new PlayerResponseMessage(request.Player, request, PlayerResponseMessage.PlayerResponseType.Accepted, drawnCard));
         }
 
-        public bool RequestDrawStock(Player player, out Card drawnCard, out string error)
+        public void RequestDrawStock(PlayerRequestMessage request)
         {
-            if (!ValidateCurrentPlayer(player, out error))
+            Card drawnCard = null;
+            string errorMessage = null;
+
+            if (!ValidateCurrentPlayer(request.Player, out errorMessage))
             {
-                drawnCard = null;
-                return false;
+                NotifyPlayerResponseListeners(new PlayerResponseMessage(request.Player, request, PlayerResponseMessage.PlayerResponseType.Denied, errorMessage));
+                NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartTurn, request.Player)); // TODO: Not really fair to ask them to start their whole turn again, is it?
+                return;
             }
-            else
+            
+            drawnCard = CurrentGame.DrawStock();
+            request.Player.DrawCard(drawnCard);
+
+            if (CurrentGame.GetStockCount() == 0)
             {
-                drawnCard = CurrentGame.DrawStock();
-                player.DrawCard(drawnCard);
-                if (CurrentGame.GetStockCount() == 0)
-                {
-                    CurrentGame.RestockFromDiscard();
-                }
-                NotifyGameMessageListeners(new PlayerActionMessage(PlayerActionMessage.PlayerAction.DrawStock, player, drawnCard));
-                return true;
+                CurrentGame.RestockFromDiscard();
             }
+
+            NotifyPlayerResponseListeners(new PlayerResponseMessage(request.Player, request, PlayerResponseMessage.PlayerResponseType.Accepted, drawnCard));
         }
 
-        public bool RequestPlaceDiscard(Player player, Card discard, out string error)
+        public void RequestPlaceDiscard(PlayerRequestMessage request)
         {
-            if (!ValidateCurrentPlayer(player, out error))
+            Card discard = request.Card;
+            string errorMessage = string.Empty;
+
+            if (!ValidateCurrentPlayer(request.Player, out errorMessage))
             {
-                return false;
+                // Do nothing
             }
             else if (discard == null)
             {
-                error = "Discard reference is null.";
-                return false;
+                errorMessage = "Discard reference is null.";
             }
-            else
+
+            if (errorMessage != string.Empty)
             {
-                CurrentGame.PlaceDiscard(discard);
-                NotifyGameMessageListeners(new PlayerActionMessage(PlayerActionMessage.PlayerAction.SetDiscard, player, discard));
-                StartTurn();
-                return true;
+                NotifyPlayerResponseListeners(new PlayerResponseMessage(request.Player, request, PlayerResponseMessage.PlayerResponseType.Denied, errorMessage));
+                NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartTurn, request.Player)); // TODO: Not really fair to ask them to start their whole turn again, is it?
+                return;
             }
+            
+            CurrentGame.PlaceDiscard(discard);
+            NotifyPlayerResponseListeners(new PlayerResponseMessage(request.Player, request, PlayerResponseMessage.PlayerResponseType.Accepted, discard));
+
+            StartTurn();
         }
 
-        public bool RequestSetMelds(Player player, List<Meld> melds, List<Card> deadWood, out string error, out Meld invalidMeld)
+        public void RequestSetMelds(PlayerRequestMessage request)
         {
-            invalidMeld = null;
+            MeldedHand hand = request.MeldedHand;
+            Meld invalidMeld = null;
+            string errorMessage = null;
 
-            if (!ValidateCurrentPlayer(player, out error))
+            if (!ValidateCurrentPlayer(request.Player, out errorMessage))
             {
-                return false;
+                // Do nothing
             }
-            else if (melds == null)
+            else if (hand == null)
             {
-                error = "Meld list reference is null.";
-                return false;
-            }
-            else if (deadWood == null)
-            {
-                error = "Dead wood list reference is null.";
-                return false;
+                errorMessage = "Melded hand reference is null.";
             }
 
-            foreach (Meld meld in melds)
+            if (errorMessage != string.Empty)
+            {
+                NotifyPlayerResponseListeners(new PlayerResponseMessage(request.Player, request, PlayerResponseMessage.PlayerResponseType.Denied, errorMessage));
+                NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartMeld, request.Player)); // TODO: Will this work?
+                return;
+            }
+
+            foreach (Meld meld in hand.Melds)
             {
                 if (!_meldChecker.IsValid(meld))
                 {
                     invalidMeld = meld;
-                    error = "Meld is invalid.";
-                    return false;
+                    errorMessage = "Meld is invalid.";
+                    NotifyPlayerResponseListeners(new PlayerResponseMessage(request.Player, request, PlayerResponseMessage.PlayerResponseType.Denied, errorMessage));
+                    return;
                 }
             }
 
-            var relevantResults = _playerResults.First(i => i.Player == player);
-            relevantResults.Melds = melds;
-            relevantResults.DeadWood = deadWood;
-            
-            StartLayOffs();
-            return true;
+            request.Player.MeldHand(hand);
+            NotifyPlayerResponseListeners(new PlayerResponseMessage(request.Player, request, PlayerResponseMessage.PlayerResponseType.Accepted));
+
+            if (CurrentGame.PlayerOne.MeldedHand != null && CurrentGame.PlayerTwo.MeldedHand != null)
+            {
+                NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartLayoff, CurrentGame.PlayerOne, CurrentGame.PlayerTwo.MeldedHand));
+                NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartLayoff, CurrentGame.PlayerTwo, CurrentGame.PlayerOne.MeldedHand));
+            }
         }
 
         private bool CanKnock(Hand hand)
@@ -280,5 +334,28 @@ namespace gin_rummy.Actors
             }
         }
 
+        public void ReceiveMessage(PlayerRequestMessage request)
+        {
+            switch (request.PlayerRequestTypeValue)
+            {
+                case PlayerRequestMessage.PlayerRequestType.DrawDiscard:
+                    RequestDrawDiscard(request);
+                    break;
+                case PlayerRequestMessage.PlayerRequestType.DrawStock:
+                    RequestDrawStock(request);
+                    break;
+                case PlayerRequestMessage.PlayerRequestType.SetDiscard:
+                    RequestPlaceDiscard(request);
+                    break;
+                case PlayerRequestMessage.PlayerRequestType.Knock:
+                    RequestKnock(request);
+                    break;
+                case PlayerRequestMessage.PlayerRequestType.MeldHand:
+                    RequestSetMelds(request);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }

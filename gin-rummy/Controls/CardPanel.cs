@@ -148,6 +148,14 @@ namespace gin_rummy.Controls
             InsertCard(c, _cards.Count);
         }
 
+        public void AddCards(List<Card> cards)
+        {
+            foreach (Card c in cards)
+            {
+                AddCard(c);
+            }
+        }
+
         public void InsertCard(Card c, int i)
         {
             Button button;

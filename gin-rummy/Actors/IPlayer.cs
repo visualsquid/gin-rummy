@@ -1,4 +1,5 @@
 ﻿using gin_rummy.Cards;
+using gin_rummy.GameStructures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,6 @@ namespace gin_rummy.Actors
         void DrawCard(Card c);
         bool DiscardCard(Card c);
         void ClearHand();
+        void MeldHand(MeldedHand hand);
     }
 }

@@ -9,8 +9,8 @@ namespace gin_rummy.Messaging
     /// <summary>
     /// Interface to be implemented if a class wishes to listen for messages from the GameMaster.
     /// </summary>
-    public interface IGameMessageListener
+    public interface IGameStatusListener
     {
-        void ReceiveMessage(GameMessage message);
+        void ReceiveMessage(GameStatusMessage message);
     }
 }
