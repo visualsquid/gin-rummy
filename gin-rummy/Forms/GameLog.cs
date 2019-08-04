@@ -14,14 +14,17 @@ namespace gin_rummy.Forms
 {
     public partial class GameLog : Form
     {
-        private GameMemoBoxLogger _gameLogger;
+        private readonly GameMemoBoxLogger _gameLogger;
 
-        public GameLog(GameMaster gameMaster)
+        public GameLog(GameMaster gameMaster, Player playerOne, Player playerTwo)
         {
             InitializeComponent();
             _gameLogger = new GameMemoBoxLogger();
             _gameLogger.MemoBox = eLog;
             gameMaster.RegisterGameStatusListener(_gameLogger);
+            gameMaster.RegisterPlayerResponseListener(_gameLogger);
+            playerOne.RegisterRequestListener(_gameLogger);
+            playerTwo.RegisterRequestListener(_gameLogger);
         }
 
     }

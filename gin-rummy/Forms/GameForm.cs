@@ -111,7 +111,7 @@ namespace gin_rummy.Forms
 
         private void randomplayCPUToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // TODO: Remove/factor debug functionality
+            // TODO: Remove/factor debug functionality (starting game with a specific hand)
             _player = new HumanPlayerGUIBased("Ya boi");
             _gameMaster = new GameMaster(_player, new RandomCPUPlayer("Dave"), new Hand(new Card[] { new Card("Ks"), new Card("Kd"), new Card("Kc"), new Card("Kh"), new Card("Qh"), new Card("Qs"), new Card("Qd"), new Card("Jh"), new Card("Js") }.ToList()));
             _game = _gameMaster.CurrentGame;
@@ -123,7 +123,7 @@ namespace gin_rummy.Forms
 
         private void InitialiseAndShowLogScreen()
         {
-            _gameLog = new GameLog(_gameMaster);
+            _gameLog = new GameLog(_gameMaster, _game.PlayerOne, _game.PlayerTwo);
             _gameLog.StartPosition = FormStartPosition.Manual;
             _gameLog.Location = new Point(this.Right + 1, this.Top);
             _gameLog.Show();
@@ -245,8 +245,6 @@ namespace gin_rummy.Forms
                     break;
             }
         }
-
-        // TODO: it's fucked - messages are being handled like a stack instead of a queue, dammit
 
         private MeldCreator ShowMeldCreator(Player player)
         {
