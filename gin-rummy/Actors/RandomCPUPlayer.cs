@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using System.Threading;
 
 namespace gin_rummy.Actors
 {
@@ -28,8 +29,10 @@ namespace gin_rummy.Actors
             _pendingMessages = new Queue<GameMessage>();
             _random = new Random();
             _tickets = new List<TicketType>();
-            _worker = null;
             InitialiseTickets();
+            _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
+            _worker.DoWork += BackgroundWorker_DoWork;
+            _worker.RunWorkerAsync();
         }
 
         private void InitialiseTickets()
@@ -123,48 +126,42 @@ namespace gin_rummy.Actors
             throw new NotImplementedException();
         }
 
-        private void SpawnBackgroundWorkerToHandleMessage()
-        {
-            _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
-            _worker.DoWork += BackgroundWorker_DoWork;
-            _worker.RunWorkerCompleted += BackgroundWorker_WorkCompleted;
-            _worker.RunWorkerAsync();
-        }
-
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            const int SleepTimeMs = 250;
             const int MaxBufferSize = 50;
             var buffer = new Queue<GameMessage>();
 
-            lock (_pendingMessages)
-            {
-                for (int i = MaxBufferSize; i > 0 && _pendingMessages.Count > 0; i--)
-                {
-                    buffer.Enqueue(_pendingMessages.Dequeue());
-                }
-            }
 
-            while (buffer.Count > 0)
+            while (true)
             {
-                GameMessage nextMessage = buffer.Dequeue();
-                if (nextMessage is GameStatusMessage)
+                lock (_pendingMessages)
                 {
-                    HandleMessage(nextMessage as GameStatusMessage);
+                    for (int i = MaxBufferSize; i > 0 && _pendingMessages.Count > 0; i--)
+                    {
+                        buffer.Enqueue(_pendingMessages.Dequeue());
+                    }
                 }
-                else if (nextMessage is PlayerResponseMessage)
-                {
-                    HandleMessage(nextMessage as PlayerResponseMessage);
-                }
-                else
-                {
-                    throw new Exception("Unexpected error - unknown message type.");
-                }
-            }
-        }
 
-        private void BackgroundWorker_WorkCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            _worker = null;
+                while (buffer.Count > 0)
+                {
+                    GameMessage nextMessage = buffer.Dequeue();
+                    if (nextMessage is GameStatusMessage)
+                    {
+                        HandleMessage(nextMessage as GameStatusMessage);
+                    }
+                    else if (nextMessage is PlayerResponseMessage)
+                    {
+                        HandleMessage(nextMessage as PlayerResponseMessage);
+                    }
+                    else
+                    {
+                        throw new Exception("Unexpected error - unknown message type.");
+                    }
+                }
+
+                Thread.Sleep(SleepTimeMs);
+            }
         }
 
         private void HandleMessage(GameStatusMessage message)
@@ -238,11 +235,6 @@ namespace gin_rummy.Actors
             {
                 _pendingMessages.Enqueue(message);
             }
-
-            if (_worker == null)
-            {
-                SpawnBackgroundWorkerToHandleMessage();
-            }
         }
 
         public override void ReceiveMessage(PlayerResponseMessage message)
@@ -250,11 +242,6 @@ namespace gin_rummy.Actors
             lock (_pendingMessages)
             {
                 _pendingMessages.Enqueue(message);
-            }
-
-            if (_worker == null)
-            {
-                SpawnBackgroundWorkerToHandleMessage();
             }
         }
     }

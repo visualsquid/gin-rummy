@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static gin_rummy.Cards.SuitColourScheme;
 using gin_rummy.Messaging;
+using System.Threading;
 
 namespace gin_rummy.Forms
 {
@@ -29,7 +30,9 @@ namespace gin_rummy.Forms
         {
             InitializeComponent();
             _pendingMessages = new Queue<GameMessage>();
-            _worker = null;
+            _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
+            _worker.DoWork += BackgroundWorker_DoWork;
+            _worker.RunWorkerAsync();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -153,11 +156,6 @@ namespace gin_rummy.Forms
             {
                 _pendingMessages.Enqueue(message);
             }
-
-            if (_worker == null) // TODO: is this causing a race condition (in all Actor classes)?
-            {
-                SpawnBackgroundWorkerToHandleMessage();
-            }
         }
 
         public void ReceiveMessage(PlayerResponseMessage response)
@@ -165,11 +163,6 @@ namespace gin_rummy.Forms
             lock (_pendingMessages)
             {
                 _pendingMessages.Enqueue(response);
-            }
-
-            if (_worker == null)
-            {
-                SpawnBackgroundWorkerToHandleMessage();
             }
         }
 
@@ -201,43 +194,41 @@ namespace gin_rummy.Forms
             return mc;
         }
 
-        private void SpawnBackgroundWorkerToHandleMessage()
-        {
-            _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
-            _worker.DoWork += BackgroundWorker_DoWork;
-            _worker.RunWorkerCompleted += BackgroundWorker_WorkCompleted;
-            _worker.RunWorkerAsync();
-        }
-
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            const int SleepTimeMs = 250;
             const int MaxBufferSize = 50;
             var buffer = new Queue<GameMessage>();
 
-            lock (_pendingMessages)
+            while (true)
             {
-                for (int i = MaxBufferSize; i > 0 && _pendingMessages.Count > 0; i--)
+                lock (_pendingMessages)
                 {
-                    buffer.Enqueue(_pendingMessages.Dequeue());
+                    for (int i = MaxBufferSize; i > 0 && _pendingMessages.Count > 0; i--)
+                    {
+                        buffer.Enqueue(_pendingMessages.Dequeue());
+                    }
                 }
-            }
 
-            while (buffer.Count > 0)
-            {
-                GameMessage nextMessage = buffer.Dequeue();
+                while (buffer.Count > 0)
+                {
+                    GameMessage nextMessage = buffer.Dequeue();
 
-                if (nextMessage is GameStatusMessage)
-                {
-                    this.Invoke((MethodInvoker)delegate { HandleMessage(nextMessage as GameStatusMessage); });
+                    if (nextMessage is GameStatusMessage)
+                    {
+                        this.Invoke((MethodInvoker)delegate { HandleMessage(nextMessage as GameStatusMessage); });
+                    }
+                    else if (nextMessage is PlayerResponseMessage)
+                    {
+                        this.Invoke((MethodInvoker)delegate { HandleMessage(nextMessage as PlayerResponseMessage); });
+                    }
+                    else
+                    {
+                        throw new Exception("Unexpected error - unknown message type.");
+                    }
                 }
-                else if (nextMessage is PlayerResponseMessage)
-                {
-                    this.Invoke((MethodInvoker)delegate { HandleMessage(nextMessage as PlayerResponseMessage); }); 
-                }
-                else
-                {
-                    throw new Exception("Unexpected error - unknown message type.");
-                }
+
+                Thread.Sleep(SleepTimeMs);
             }
         }
 
@@ -342,11 +333,6 @@ namespace gin_rummy.Forms
                 default:
                     break;
             }
-        }
-
-        private void BackgroundWorker_WorkCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            _worker = null;
         }
     }
 }

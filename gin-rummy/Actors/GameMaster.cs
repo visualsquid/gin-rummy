@@ -54,7 +54,6 @@ namespace gin_rummy.Actors
         public GameMaster(Player playerOne, Player playerTwo)
         {
             _pendingMessages = new Queue<GameMessage>();
-            _worker = null;
             Log = new List<string>();
             _statusListeners = new HashSet<IGameStatusListener>();
             _responseListeners = new HashSet<IPlayerResponseListener>();
@@ -68,6 +67,9 @@ namespace gin_rummy.Actors
             playerTwo.RegisterRequestListener(this);
             _deadWoodScorer = new DeadWoodScorer();
             _meldChecker = new MeldChecker();
+            _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
+            _worker.DoWork += BackgroundWorker_DoWork;
+            _worker.RunWorkerAsync();
         }
 
 
@@ -79,29 +81,35 @@ namespace gin_rummy.Actors
 
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            const int SleepTimeMs = 250;
             const int MaxBufferSize = 50;
             var buffer = new Queue<GameMessage>();
 
-            lock (_pendingMessages)
+            while (true)
             {
-                for (int i = MaxBufferSize; i > 0 && _pendingMessages.Count > 0; i--)
+                lock (_pendingMessages)
                 {
-                    buffer.Enqueue(_pendingMessages.Dequeue());
+                    for (int i = MaxBufferSize; i > 0 && _pendingMessages.Count > 0; i--)
+                    {
+                        buffer.Enqueue(_pendingMessages.Dequeue());
+                    }
                 }
-            }
 
-            while (buffer.Count > 0)
-            {
-                GameMessage nextMessage = buffer.Dequeue();
+                while (buffer.Count > 0)
+                {
+                    GameMessage nextMessage = buffer.Dequeue();
 
-                if (nextMessage is PlayerRequestMessage)
-                {
-                    HandleMessage(nextMessage as PlayerRequestMessage);
+                    if (nextMessage is PlayerRequestMessage)
+                    {
+                        HandleMessage(nextMessage as PlayerRequestMessage);
+                    }
+                    else
+                    {
+                        throw new Exception("Unexpected error - unknown message type.");
+                    }
                 }
-                else
-                {
-                    throw new Exception("Unexpected error - unknown message type.");
-                }
+
+                Thread.Sleep(SleepTimeMs);
             }
         }
 
@@ -127,11 +135,6 @@ namespace gin_rummy.Actors
                 default:
                     break;
             }
-        }
-
-        private void BackgroundWorker_WorkCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            _worker = null;
         }
 
         private void InitialiseGame()
@@ -402,19 +405,7 @@ namespace gin_rummy.Actors
             {
                 _pendingMessages.Enqueue(request);
             }
-
-            if (_worker == null)
-            {
-                SpawnBackgroundWorkerToHandleMessage();
-            }
         }
 
-        private void SpawnBackgroundWorkerToHandleMessage()
-        {
-            _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
-            _worker.DoWork += BackgroundWorker_DoWork;
-            _worker.RunWorkerCompleted += BackgroundWorker_WorkCompleted;
-            _worker.RunWorkerAsync();
-        }
     }
 }
