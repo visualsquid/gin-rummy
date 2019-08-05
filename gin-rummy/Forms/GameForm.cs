@@ -20,7 +20,8 @@ namespace gin_rummy.Forms
     public partial class GameForm : Form, IGameStatusListener, IPlayerResponseListener
     {
         private readonly Queue<GameMessage> _pendingMessages;
-        private BackgroundWorker _worker;
+        private readonly BackgroundWorker _messageHandler;
+
         private Game _game;
         private GameMaster _gameMaster;
         private GameLog _gameLog;
@@ -30,9 +31,9 @@ namespace gin_rummy.Forms
         {
             InitializeComponent();
             _pendingMessages = new Queue<GameMessage>();
-            _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
-            _worker.DoWork += BackgroundWorker_DoWork;
-            _worker.RunWorkerAsync();
+            _messageHandler = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
+            _messageHandler.DoWork += MessageHandler_DoWork;
+            _messageHandler.RunWorkerAsync();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -189,7 +190,7 @@ namespace gin_rummy.Forms
             return mc;
         }
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void MessageHandler_DoWork(object sender, DoWorkEventArgs e)
         {
             const int SleepTimeMs = 250;
             const int MaxBufferSize = 50;
@@ -215,7 +216,7 @@ namespace gin_rummy.Forms
                     }
                     else if (nextMessage is PlayerResponseMessage)
                     {
-                        this.Invoke((MethodInvoker)delegate { HandleMessage(nextMessage as PlayerResponseMessage); }); // TODO: error here when closing GameForm
+                        this.Invoke((MethodInvoker)delegate { HandleMessage(nextMessage as PlayerResponseMessage); }); // TODO: error here _sometimes_ when closing GameForm
                     }
                     else
                     {

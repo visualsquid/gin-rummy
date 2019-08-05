@@ -22,7 +22,7 @@ namespace gin_rummy.Actors
         private readonly Queue<GameMessage> _pendingMessages;
         private readonly Random _random;
         private readonly List<TicketType> _tickets;
-        private BackgroundWorker _worker;
+        private readonly BackgroundWorker _messageHandler;
 
         public RandomCPUPlayer(string name) : base (name)
         {
@@ -30,9 +30,9 @@ namespace gin_rummy.Actors
             _random = new Random();
             _tickets = new List<TicketType>();
             InitialiseTickets();
-            _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
-            _worker.DoWork += BackgroundWorker_DoWork;
-            _worker.RunWorkerAsync();
+            _messageHandler = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
+            _messageHandler.DoWork += MessageHandler_DoWork;
+            _messageHandler.RunWorkerAsync();
         }
 
         private void InitialiseTickets()
@@ -126,7 +126,7 @@ namespace gin_rummy.Actors
             throw new NotImplementedException();
         }
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void MessageHandler_DoWork(object sender, DoWorkEventArgs e)
         {
             const int SleepTimeMs = 250;
             const int MaxBufferSize = 50;

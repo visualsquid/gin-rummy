@@ -17,20 +17,16 @@ namespace gin_rummy.Messaging
     {
 
         private readonly Queue<GameMessage> _pendingMessages;
-        private readonly Queue<string> _pendingLogs;
-        private readonly BackgroundWorker _foreman;
-        private BackgroundWorker _worker;
+        private readonly BackgroundWorker _messageHandler;
 
         public TextBox MemoBox { get; set; }
 
         public GameMemoBoxLogger()
         {
             _pendingMessages = new Queue<GameMessage>();
-            _pendingLogs = new Queue<string>();
-            _foreman = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
-            _foreman.DoWork += BackgroundForeman_DoWork;
-            _foreman.RunWorkerAsync();
-            _worker = null;
+            _messageHandler = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
+            _messageHandler.DoWork += MessageHandler_DoWork;
+            _messageHandler.RunWorkerAsync();
         }
 
         public List<string> GetLog()
@@ -64,85 +60,49 @@ namespace gin_rummy.Messaging
             }
         }
 
-        private void BackgroundForeman_DoWork(object sender, DoWorkEventArgs e)
+        private void MessageHandler_DoWork(object sender, DoWorkEventArgs e)
         {
             const int SleepTimeMs = 500;
+            const int MaxBatchSize = 50;
+            Queue<GameMessage> _buffer = new Queue<GameMessage>();
+            
             while (true)
             {
                 lock (_pendingMessages)
                 {
-                    if (_pendingMessages.Count > 0 && _worker == null)
+                    for (int i = MaxBatchSize; i > 0 && _pendingMessages.Count > 0; i--)
                     {
-                        _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
-                        _worker.DoWork += BackgroundWorker_DoWork;
-                        _worker.RunWorkerCompleted += BackgroundWorker_WorkCompleted;
-                        _worker.RunWorkerAsync();
+                        _buffer.Enqueue(_pendingMessages.Dequeue());
                     }
                 }
+
+                while (_buffer.Count > 0)
+                {
+                    GameMessage nextMessage = _buffer.Dequeue();
+                    string nextLog = "";
+                    if (nextMessage is GameStatusMessage)
+                    {
+                        nextLog = ParseGameStatusMessage(nextMessage as GameStatusMessage);
+                    }
+                    else if (nextMessage is PlayerRequestMessage)
+                    {
+                        nextLog = ParsePlayerRequestMessage(nextMessage as PlayerRequestMessage);
+                    }
+                    else if (nextMessage is PlayerResponseMessage)
+                    {
+                        nextLog = ParsePlayerResponseMessage(nextMessage as PlayerResponseMessage);
+                    }
+                    else
+                    {
+                        nextLog = "Unexpected error - unknown message type.";
+                    }
+
+                    WriteLog(nextLog);
+                }
+
                 Thread.Sleep(SleepTimeMs);
             }
-        }
-
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            const int MaxBatchSize = 50;
-            Queue<GameMessage> _buffer = new Queue<GameMessage>();
             
-            lock (_pendingMessages)
-            { 
-                for(int i = MaxBatchSize; i > 0 && _pendingMessages.Count > 0; i--)
-                {
-                    _buffer.Enqueue(_pendingMessages.Dequeue());
-                }
-            }
-
-            while (_buffer.Count > 0)
-            {
-                GameMessage nextMessage = _buffer.Dequeue();
-                string nextLog = "";
-                if (nextMessage is GameStatusMessage)
-                {
-                    nextLog = ParseGameStatusMessage(nextMessage as GameStatusMessage);
-                }
-                else if (nextMessage is PlayerRequestMessage)
-                {
-                    nextLog = ParsePlayerRequestMessage(nextMessage as PlayerRequestMessage);
-                }
-                else if (nextMessage is PlayerResponseMessage)
-                {
-                    nextLog = ParsePlayerResponseMessage(nextMessage as PlayerResponseMessage);
-                }
-                else
-                {
-                    nextLog = "Unexpected error - unknown message type.";
-                }
-
-                lock (_pendingLogs)
-                {
-                    _pendingLogs.Enqueue(nextLog);
-                }
-            }
-        }
-
-        private void BackgroundWorker_WorkCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            const int MaxBatchSize = 50;
-            var _buffer = new Queue<string>();
-
-            lock (_pendingLogs)
-            {
-                for (int i = MaxBatchSize; i > 0 && _pendingLogs.Count > 0; i--)
-                {
-                    _buffer.Enqueue(_pendingLogs.Dequeue());
-                }
-            }
-
-            while (_buffer.Count > 0)
-            {
-                WriteLog(_buffer.Dequeue());
-            }
-
-            _worker = null;
         }
 
         public override void WriteLog(string message)

@@ -33,7 +33,7 @@ namespace gin_rummy.Actors
         }
 
         private readonly Queue<GameMessage> _pendingMessages;
-        private BackgroundWorker _worker;
+        private readonly BackgroundWorker _messageHandler;
         private HashSet<IGameStatusListener> _statusListeners;
         private HashSet<IPlayerResponseListener> _responseListeners;
         private DeadWoodScorer _deadWoodScorer;
@@ -61,9 +61,9 @@ namespace gin_rummy.Actors
             playerTwo.RegisterRequestListener(this);
             _deadWoodScorer = new DeadWoodScorer();
             _meldChecker = new MeldChecker();
-            _worker = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
-            _worker.DoWork += BackgroundWorker_DoWork;
-            _worker.RunWorkerAsync();
+            _messageHandler = new BackgroundWorker() { WorkerReportsProgress = false, WorkerSupportsCancellation = false };
+            _messageHandler.DoWork += MessageHandler_DoWork;
+            _messageHandler.RunWorkerAsync();
         }
 
 
@@ -73,7 +73,7 @@ namespace gin_rummy.Actors
             _playerOneStartingHand = playerOneStartingHand;
         }
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        private void MessageHandler_DoWork(object sender, DoWorkEventArgs e)
         {
             const int SleepTimeMs = 250;
             const int MaxBufferSize = 50;
@@ -304,11 +304,11 @@ namespace gin_rummy.Actors
         {
             MeldedHand hand = request.MeldedHand;
             Meld invalidMeld = null;
-            string errorMessage = null;
+            string errorMessage = string.Empty;
 
-            if (!ValidateCurrentPlayer(request.Player, out errorMessage))
+            if (request.Player == null)
             {
-                // Do nothing
+                errorMessage = "Player reference is null.";
             }
             else if (hand == null)
             {
