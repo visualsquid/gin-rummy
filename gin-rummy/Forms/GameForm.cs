@@ -215,7 +215,7 @@ namespace gin_rummy.Forms
                     }
                     else if (nextMessage is PlayerResponseMessage)
                     {
-                        this.Invoke((MethodInvoker)delegate { HandleMessage(nextMessage as PlayerResponseMessage); });
+                        this.Invoke((MethodInvoker)delegate { HandleMessage(nextMessage as PlayerResponseMessage); }); // TODO: error here when closing GameForm
                     }
                     else
                     {
