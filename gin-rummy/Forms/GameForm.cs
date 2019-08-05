@@ -145,11 +145,6 @@ namespace gin_rummy.Forms
             //_gameMaster.StartGame();
         }
 
-        private void TestGameFinished(object sender, EventArgs e)
-        {
-            MessageBox.Show(string.Join("\n", _gameMaster.Log));
-        }
-
         public void ReceiveMessage(GameStatusMessage message)
         {
             lock (_pendingMessages)
@@ -234,9 +229,6 @@ namespace gin_rummy.Forms
 
         private void HandleMessage(GameStatusMessage message)
         {
-            string error;
-            Meld invalidMeld;
-
             switch (message.GameStatusChangeValue)
             {
                 case GameStatusMessage.GameStatusChange.GameInitialised:

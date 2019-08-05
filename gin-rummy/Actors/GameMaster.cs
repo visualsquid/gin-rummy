@@ -32,10 +32,6 @@ namespace gin_rummy.Actors
             public List<Card> DeadWood { get; set; }
         }
 
-        private Thread _turnHandler;
-        private Thread _endGameHandler;
-        private Thread _layOffsHandler;
-
         private readonly Queue<GameMessage> _pendingMessages;
         private BackgroundWorker _worker;
         private HashSet<IGameStatusListener> _statusListeners;
@@ -46,7 +42,6 @@ namespace gin_rummy.Actors
         private List<PlayerResults> _playerResults;
         private Hand _playerOneStartingHand; // TODO: remove/refactor debug functionality
 
-        public List<string> Log { get; } // TODO: remove old log functionality
         public EventHandler GameFinished { get; set; }
         public Player CurrentPlayer { get; set; }
         public Game CurrentGame { get; private set; }
@@ -54,7 +49,6 @@ namespace gin_rummy.Actors
         public GameMaster(Player playerOne, Player playerTwo)
         {
             _pendingMessages = new Queue<GameMessage>();
-            Log = new List<string>();
             _statusListeners = new HashSet<IGameStatusListener>();
             _responseListeners = new HashSet<IPlayerResponseListener>();
             _playerResults = new List<PlayerResults>();
@@ -193,18 +187,6 @@ namespace gin_rummy.Actors
             //_turnHandler = new Thread(new ThreadStart(HandleTurns));
             //_turnHandler.Start();
             HandleTurns();
-        }
-
-        private void StartEndGame()
-        {
-            _endGameHandler = new Thread(new ThreadStart(HandleEndGame));
-            _endGameHandler.Start();
-        }
-
-        private void StartLayOffs()
-        {
-            _layOffsHandler = new Thread(new ThreadStart(HandleLayOffs));
-            _layOffsHandler.Start();
         }
 
         private void HandleTurns()
