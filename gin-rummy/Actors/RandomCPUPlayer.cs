@@ -78,7 +78,7 @@ namespace gin_rummy.Actors
             return card;
         }
 
-        protected override void ThreadedYourTurn()
+        protected override void YourTurn()
         {
             switch (GetNextTicket())
             {
@@ -99,9 +99,8 @@ namespace gin_rummy.Actors
             }
         }
 
-        protected override void ThreadedRequestMelds()
+        protected override void RequestMelds()
         {
-            // TODO: implement random CPU get melds
             var cardsInHand = this._hand.ViewHand();
             var possibleMeldSets = _meldChecker.GetAllPossibleMeldSets(cardsInHand);
             List<Meld> meldSet;
@@ -116,14 +115,13 @@ namespace gin_rummy.Actors
             var deadWood = _meldChecker.GetDeadWood(meldSet, cardsInHand);
             
             NotifyRequestListeners(new PlayerRequestMessage(PlayerRequestMessage.PlayerRequestType.MeldHand, this, new MeldedHand(meldSet, deadWood)));
-            //_gameMaster.RequestSetMelds(this, new MeldedHand(meldSet, deadWood), out error, out invalidMeld);
         }
 
-        protected override void ThreadedRequestLayOffs()
+        protected override void RequestLayoffs()
         {
-            // TODO: implement random CPU get lay offs
-            //_gameMaster.?
-            throw new NotImplementedException();
+            var layoffs = new List<Layoff>();
+            // TODO: actually bother to implement some layoffs?
+            NotifyRequestListeners(new PlayerRequestMessage(PlayerRequestMessage.PlayerRequestType.LayoffCards, this, layoffs));
         }
 
         private void MessageHandler_DoWork(object sender, DoWorkEventArgs e)
@@ -174,19 +172,19 @@ namespace gin_rummy.Actors
                 case GameStatusMessage.GameStatusChange.StartTurn:
                     if (message.Player == this)
                     {
-                        ThreadedYourTurn();
+                        YourTurn();
                     }
                     break;
                 case GameStatusMessage.GameStatusChange.StartMeld:
                     if (message.Player == this)
                     {
-                        ThreadedRequestMelds();
+                        RequestMelds();
                     }
                     break;
                 case GameStatusMessage.GameStatusChange.StartLayoff:
                     if (message.Player == this)
                     {
-                        ThreadedRequestLayOffs();
+                        RequestLayoffs();
                     }
                     break;
                 default:

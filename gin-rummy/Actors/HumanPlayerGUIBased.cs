@@ -65,17 +65,17 @@ namespace gin_rummy.Actors
         //    return DrawCard(out drawnCard, out error);
         //}
 
-        protected override void ThreadedRequestLayOffs()
+        protected override void RequestLayoffs()
         {
             //TODO: notify/enable the GUI
         }
 
-        protected override void ThreadedRequestMelds()
+        protected override void RequestMelds()
         {
             //TODO: notify/enable the GUI
         }
 
-        protected override void ThreadedYourTurn()
+        protected override void YourTurn()
         {
             //TODO: notify/enable the GUI
         }

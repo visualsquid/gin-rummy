@@ -135,6 +135,8 @@ namespace gin_rummy.Messaging
                         return $"{response.Player.Name} sets discard {response.Card.ToString()}.";
                     case PlayerRequestMessage.PlayerRequestType.Knock:
                         return $"{response.Player.Name} knocks.";
+                    case PlayerRequestMessage.PlayerRequestType.MeldHand:
+                        return $"{response.Player.Name} melds their hand.";
                     default:
                         return "Unknown message";
                 }
@@ -170,6 +172,8 @@ namespace gin_rummy.Messaging
                     return $"{message.Player.Name} requests to discard {message.Card.ToString()}.";
                 case PlayerRequestMessage.PlayerRequestType.Knock:
                     return $"{message.Player.Name} requests knock...";
+                case PlayerRequestMessage.PlayerRequestType.MeldHand:
+                    return $"{message.Player.Name} is ready to meld...";
                 default:
                     return "Unknown message";
             }

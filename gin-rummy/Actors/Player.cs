@@ -78,26 +78,26 @@ namespace gin_rummy.Actors
             //_gameMaster = gm;
             //_yourTurn = new Thread(new ThreadStart(ThreadedYourTurn));
             //_yourTurn.Start();
-            ThreadedYourTurn();
+            YourTurn();
         }
 
         public void RequestMelds(GameMaster gm)
         {
             //_gameMaster = gm;
-            _getMelds = new Thread(new ThreadStart(ThreadedRequestMelds));
+            _getMelds = new Thread(new ThreadStart(RequestMelds));
             _getMelds.Start();
         }
 
         public void RequestLayOffs(GameMaster gm, List<Meld> otherPlayerMelds)
         {
             //_gameMaster = gm;
-            _getLayOffs = new Thread(new ThreadStart(ThreadedRequestMelds));
+            _getLayOffs = new Thread(new ThreadStart(RequestMelds));
             _getLayOffs.Start();
         }
 
-        protected abstract void ThreadedYourTurn();
-        protected abstract void ThreadedRequestMelds();
-        protected abstract void ThreadedRequestLayOffs();
+        protected abstract void YourTurn();
+        protected abstract void RequestMelds();
+        protected abstract void RequestLayoffs();
         public abstract void ReceiveMessage(GameStatusMessage message);
         public abstract void ReceiveMessage(PlayerResponseMessage message);
 

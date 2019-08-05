@@ -97,6 +97,7 @@
     </Compile>
     <Compile Include="GameStructures\Game.cs" />
     <Compile Include="GameStructures\Hand.cs" />
+    <Compile Include="GameStructures\Layoff.cs" />
     <Compile Include="GameStructures\Meld.cs" />
     <Compile Include="GameStructures\MeldedHand.cs" />
     <Compile Include="GameStructures\Showdown.cs" />
