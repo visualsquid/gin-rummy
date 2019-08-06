@@ -121,7 +121,7 @@ namespace gin_rummy.Forms
         {
             // TODO: Remove/factor debug functionality (starting game with a specific hand)
             _player = new HumanPlayerGUIBased("Ya boi");
-            _gameMaster = new GameMaster(_player, new RandomCPUPlayer("Dave"), new Hand(new Card[] { new Card("Ks"), new Card("Kd"), new Card("Kc"), new Card("Kh"), new Card("Qh"), new Card("Qs"), new Card("Qd"), new Card("Jh"), new Card("Js") }.ToList()));
+            _gameMaster = new GameMaster(_player, new RandomCPUPlayer("Dave"), new Hand(new Card[] { new Card("Ks"), new Card("Kd"), new Card("Kc"), new Card("Kh"), new Card("Qh"), new Card("Qs"), new Card("Qd"), new Card("Jh"), new Card("Js") }.ToList()), new Hand(new Card[] { new Card("Ts"), new Card("9s"), new Card("8s"), new Card("7s"), new Card("6s"), new Card("5s"), new Card("4s"), new Card("3s"), new Card("2s") }.ToList()));
             _game = _gameMaster.CurrentGame;
             _gameMaster.RegisterGameStatusListener(this);
             _gameMaster.RegisterPlayerResponseListener(this);

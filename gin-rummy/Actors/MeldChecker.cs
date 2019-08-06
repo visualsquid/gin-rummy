@@ -148,7 +148,7 @@ namespace gin_rummy.Actors
 
             var meldsets = new List<List<Meld>>();
 
-            int count = (int)Math.Pow(2, melds.Count);
+            int count = (int)Math.Pow(2, melds.Count); // TODO: this is too many combinations...
             for (int i = 1; i <= count - 1; i++)
             {
                 string bitMask = Convert.ToString(i, 2).PadLeft(melds.Count, '0');

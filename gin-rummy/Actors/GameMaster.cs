@@ -41,6 +41,7 @@ namespace gin_rummy.Actors
 
         private List<PlayerResults> _playerResults;
         private Hand _playerOneStartingHand; // TODO: remove/refactor debug functionality
+        private Hand _playerTwoStartingHand; // TODO: remove/refactor debug functionality
 
         public EventHandler GameFinished { get; set; }
         public Player CurrentPlayer { get; set; }
@@ -67,10 +68,11 @@ namespace gin_rummy.Actors
         }
 
 
-        public GameMaster(Player playerOne, Player playerTwo, Hand playerOneStartingHand) : this(playerOne, playerTwo)  
+        public GameMaster(Player playerOne, Player playerTwo, Hand playerOneStartingHand, Hand playerTwoStartingHand) : this(playerOne, playerTwo)  
         {
             // TODO: remove/refactor debug functionality
             _playerOneStartingHand = playerOneStartingHand;
+            _playerTwoStartingHand = playerTwoStartingHand;
         }
 
         private void MessageHandler_DoWork(object sender, DoWorkEventArgs e)
@@ -126,6 +128,9 @@ namespace gin_rummy.Actors
                 case PlayerRequestMessage.PlayerRequestType.MeldHand:
                     RequestSetMelds(message);
                     break;
+                case PlayerRequestMessage.PlayerRequestType.LayoffCards:
+                    RequestSetLayoffs(message);
+                    break;
                 default:
                     break;
             }
@@ -134,6 +139,7 @@ namespace gin_rummy.Actors
         private void InitialiseGame()
         {
             CurrentGame.ShuffleDeck();
+            // TODO: remove debug functionality
             if (_playerOneStartingHand != null)
             {
                 foreach (Card c in _playerOneStartingHand.ViewHand())
@@ -145,7 +151,17 @@ namespace gin_rummy.Actors
             {
                 CurrentGame.DealHand(CurrentGame.PlayerOne, Game.InitialHandSize);
             }
-            CurrentGame.DealHand(CurrentGame.PlayerTwo, Game.InitialHandSize);
+            if (_playerTwoStartingHand != null)
+            {
+                foreach (Card c in _playerTwoStartingHand.ViewHand())
+                {
+                    CurrentGame.PlayerTwo.DrawCard(c);
+                }
+            }
+            else
+            {
+                CurrentGame.DealHand(CurrentGame.PlayerTwo, Game.InitialHandSize);
+            }
             CurrentGame.CreateStacks();
             NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.GameInitialised, null));
         }
@@ -184,8 +200,6 @@ namespace gin_rummy.Actors
 
         private void StartTurn()
         {
-            //_turnHandler = new Thread(new ThreadStart(HandleTurns));
-            //_turnHandler.Start();
             HandleTurns();
         }
 
@@ -199,7 +213,7 @@ namespace gin_rummy.Actors
             {
                 CurrentPlayer = CurrentGame.PlayerTwo;
             }
-            //CurrentPlayer.YourTurn(this); // TODO: Sort this out
+            
             NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartTurn, CurrentPlayer));
         }
 
@@ -341,6 +355,49 @@ namespace gin_rummy.Actors
                 NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartLayoff, CurrentGame.PlayerOne, CurrentGame.PlayerTwo.MeldedHand));
                 NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartLayoff, CurrentGame.PlayerTwo, CurrentGame.PlayerOne.MeldedHand));
             }
+        }
+
+        public void RequestSetLayoffs(PlayerRequestMessage request)
+        {
+            List<Layoff> layoffs = request.Layoffs;
+            string errorMessage = string.Empty;
+
+            if (request.Player == null)
+            {
+                errorMessage = "Player reference is null.";
+            }
+            else if (layoffs == null)
+            {
+                errorMessage = "Layoffs list is null.";
+            }
+
+            if (errorMessage != string.Empty)
+            {
+                NotifyPlayerResponseListeners(new PlayerResponseMessage(request.Player, request, PlayerResponseMessage.PlayerResponseType.Denied, errorMessage));
+                NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartLayoff, request.Player)); // TODO: Will this work?
+                return;
+            }
+
+            foreach (var layoff in layoffs)
+            {   
+                // TODO: validate each layoff
+                //if (!_meldChecker.IsValid(meld))
+                //{
+                //    invalidMeld = meld;
+                //    errorMessage = "Meld is invalid.";
+                //    NotifyPlayerResponseListeners(new PlayerResponseMessage(request.Player, request, PlayerResponseMessage.PlayerResponseType.Denied, errorMessage));
+                //    return;
+                //}
+            }
+
+            //request.Player.MeldHand(layoff);
+            //NotifyPlayerResponseListeners(new PlayerResponseMessage(request.Player, request, PlayerResponseMessage.PlayerResponseType.Accepted));
+
+            //if (CurrentGame.PlayerOne.MeldedHand != null && CurrentGame.PlayerTwo.MeldedHand != null)
+            //{
+            //    NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartLayoff, CurrentGame.PlayerOne, CurrentGame.PlayerTwo.MeldedHand));
+            //    NotifyGameStatusListeners(new GameStatusMessage(GameStatusMessage.GameStatusChange.StartLayoff, CurrentGame.PlayerTwo, CurrentGame.PlayerOne.MeldedHand));
+            //}
         }
 
         private bool CanKnock(Hand hand)
